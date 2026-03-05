@@ -17,9 +17,12 @@ export function Form({
   ...props
 }: FormProps) {
   return (
-    <form onSubmit={onSubmit} className="space-y-6 bg-white p-6 rounded-lg shadow" {...props}>
-      {title && <h2 className="text-2xl font-bold text-gray-900">{title}</h2>}
-      {subtitle && <p className="text-gray-600">{subtitle}</p>}
+    <form onSubmit={onSubmit} className="space-y-6 bg-white p-8 rounded-lg shadow-lg" {...props}>
+      <div className="flex flex-col items-center justify-center mb-8">
+        <img src="/icon.png" alt="CoursePro" className="w-16 h-16 rounded-lg mb-4 shadow-md" />
+        {title && <h2 className="text-3xl font-bold text-gray-900 text-center">{title}</h2>}
+        {subtitle && <p className="text-gray-600 text-center mt-2">{subtitle}</p>}
+      </div>
       {children}
     </form>
   )

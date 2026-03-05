@@ -71,7 +71,7 @@ export default function AddUserModal({ isOpen, onClose, onUserCreated }: AddUser
         first_name: formData.first_name,
         last_name: formData.last_name,
         email: formData.email,
-        phone: formData.phone || null,
+        phone: formData.phone || undefined,
         password: formData.password,
         password_confirmation: formData.password_confirmation,
         roles: formData.roles,

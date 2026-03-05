@@ -6,6 +6,9 @@ import { AuthProvider } from "@/components/auth/AuthProvider";
 export const metadata: Metadata = {
   title: "CoursePro - Admin & Instructor Portal",
   description: "Professional course management platform for administrators and instructors",
+  icons: {
+    icon: '/icon.png',
+  },
 };
 
 export default function RootLayout({

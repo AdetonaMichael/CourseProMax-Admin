@@ -78,7 +78,7 @@ export default function CategoriesPage() {
   const loadCategories = async () => {
     try {
       setLoading(true)
-      const response = await fetchCategories(1, { per_page: 100 })
+      const response = await fetchCategories(1, 100)
       setCategories(response.categories)
     } catch (err) {
       const apiError = handleAPIError(err)

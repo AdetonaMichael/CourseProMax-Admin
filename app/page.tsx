@@ -20,10 +20,10 @@ export default function Home() {
         <main className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-32">
           <div className="text-center max-w-4xl mx-auto mb-20">
             <div className="inline-block mb-6">
-              <span className="px-4 py-2 rounded-full bg-blue-100 text-blue-700 text-sm font-semibold">✨ The Future of Course Management</span>
+              <span className="px-4 py-2 rounded-full bg-black text-white text-sm font-semibold">✨ The Future of Course Management</span>
             </div>
             <h1 className="text-5xl md:text-7xl font-bold text-gray-900 mb-6 leading-tight">
-              Professional Course <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">Management</span> Platform
+              Professional Course <span className="bg-gradient-to-r from-black to-gray-800 bg-clip-text text-transparent">Management</span> Platform
             </h1>
             <p className="text-lg md:text-xl text-gray-600 mb-10 leading-relaxed max-w-2xl mx-auto">
               Enterprise-grade platform for managing courses, instructors, and students. Secure, scalable, and built for educational excellence.
@@ -112,13 +112,13 @@ export default function Home() {
       {/* CTA Section */}
       <section className="py-20 px-4 sm:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto">
-          <div className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl shadow-xl p-12 md:p-16 text-center text-white">
+          <div className="bg-gradient-to-r from-black to-gray-800 rounded-2xl shadow-xl p-12 md:p-16 text-center text-white">
             <h3 className="text-4xl md:text-5xl font-bold mb-4">Ready to Transform Your Platform?</h3>
-            <p className="text-lg text-blue-100 mb-10 max-w-2xl mx-auto">
+            <p className="text-lg text-gray-200 mb-10 max-w-2xl mx-auto">
               Join thousands of educators and administrators using CoursePro to deliver world-class learning experiences.
             </p>
             <Link href="/register">
-              <Button size="lg" variant="primary" className="bg-white text-blue-600 hover:bg-gray-100">Create Your Account</Button>
+              <Button size="lg" variant="primary">Create Your Account</Button>
             </Link>
           </div>
         </div>

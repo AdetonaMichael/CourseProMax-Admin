@@ -13,7 +13,8 @@ interface Course {
   category_name: string
   level: 'Beginner' | 'Intermediate' | 'Advanced'
   total_lessons: number
-  total_students: number
+  total_students?: number
+  students_count?: number
   price: number
   rating: number
   is_active: boolean
@@ -105,7 +106,7 @@ export default function CourseTable({
                     <span className="cell-text">{course.total_lessons}</span>
                   </td>
                   <td className="col-metrics">
-                    <span className="cell-text">{course.total_students}</span>
+                    <span className="cell-text">{course.students_count || course.total_students || 0}</span>
                   </td>
                   <td className="col-rating">
                     <div className="rating-display">

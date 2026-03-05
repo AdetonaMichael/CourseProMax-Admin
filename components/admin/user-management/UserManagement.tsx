@@ -49,7 +49,7 @@ export default function UserManagementPage() {
       const total = data?.pagination?.total || users.length
       const active = users.filter((u) => u.status === 'active').length
       const instructors = users.filter((u) => u.roles?.includes('instructor')).length
-      const blocked = users.filter((u) => u.status === 'blocked').length
+      const blocked = users.filter((u) => u.status === 'banned').length
 
       setStats({
         total,

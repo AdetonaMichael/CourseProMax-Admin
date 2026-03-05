@@ -67,7 +67,7 @@ export default function CoursesPage() {
     }
   }
 
-  const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
     setPage(1)
   }

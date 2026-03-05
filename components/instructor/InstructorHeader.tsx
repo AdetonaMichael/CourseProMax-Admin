@@ -26,7 +26,7 @@ export function InstructorHeader() {
             <p className="text-sm font-medium text-gray-900">
               {user?.first_name} {user?.last_name}
             </p>
-            <p className="text-xs text-gray-500 uppercase">{user?.role}</p>
+            <p className="text-xs text-gray-500 uppercase">{user?.roles?.[0]}</p>
           </div>
           <div className="w-10 h-10 bg-green-600 rounded-full flex items-center justify-center text-white font-bold">
             {user?.first_name?.[0]}{user?.last_name?.[0]}

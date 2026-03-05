@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import { useAuth } from '@/hooks/useAuth'
 import { Button } from '@/components/shared/Button'
@@ -21,9 +22,19 @@ export function AdminSidebar() {
 
   return (
     <aside className="w-64 bg-gray-900 text-white h-screen flex flex-col">
-      <div className="p-6 border-b border-gray-800">
-        <h1 className="text-2xl font-bold">CoursePro</h1>
-        <p className="text-sm text-gray-400 mt-1">Admin Panel</p>
+      <div className="p-6 border-b border-gray-800 flex items-center gap-3">
+        <Image 
+          src="/icon.png" 
+          alt="CoursePro" 
+          width={40} 
+          height={40}
+          className="rounded-lg flex-shrink-0" 
+          priority
+        />
+        <div className="min-w-0">
+          <h1 className="text-xl font-bold">CourseProMax</h1>
+          <p className="text-xs text-gray-400 whitespace-nowrap">Admin Panel</p>
+        </div>
       </div>
 
       <nav className="flex-1 space-y-2 px-4 py-6 overflow-y-auto">
@@ -35,7 +46,7 @@ export function AdminSidebar() {
               href={item.href}
               className={`flex items-center space-x-3 px-4 py-3 rounded-lg transition ${
                 isActive
-                  ? 'bg-blue-600 text-white'
+                  ? 'bg-black text-white'
                   : 'text-gray-300 hover:bg-gray-800'
               }`}
             >
