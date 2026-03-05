@@ -26,10 +26,10 @@ export default function CourseForm({ course, loading = false, onSubmit, onError 
     description: course?.description || '',
     instructor_name: course?.instructor_name || '',
     level: (course?.level || 'Beginner') as 'Beginner' | 'Intermediate' | 'Advanced',
-    price: course?.price || 0,
+    price: !isNaN(Number(course?.price)) ? Number(course?.price) : 0,
     duration: course?.duration || '',
     thumbnail: course?.thumbnail || '',
-    ai_score: course?.ai_score || 0,
+    ai_score: !isNaN(Number(course?.ai_score)) ? Number(course?.ai_score) : 0,
     is_active: course?.is_active || true,
     certificate_available: course?.certificate_available || false,
   })
@@ -236,7 +236,7 @@ export default function CourseForm({ course, loading = false, onSubmit, onError 
               type="number"
               id="ai_score"
               name="ai_score"
-              value={formData.ai_score}
+              value={formData.ai_score.toString()}
               onChange={handleInputChange}
               min="0"
               max="100"
@@ -270,7 +270,7 @@ export default function CourseForm({ course, loading = false, onSubmit, onError 
               type="number"
               id="price"
               name="price"
-              value={formData.price}
+              value={formData.price.toString()}
               onChange={handleInputChange}
               min="0"
               step="100"

@@ -51,8 +51,8 @@ export default function EditCoursePage() {
   if (loading) {
     return (
       <AdminLayout>
-        <div style={{ padding: '20px', backgroundColor: '#ffffff', minHeight: '100vh' }}>
-          <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
+        <div className="bg-white min-h-screen p-4 md:p-6 lg:p-8">
+          <div className="w-full">
             <div className="edit-course-page">
               <div className="loading-state">
                 <div className="spinner"></div>
@@ -68,8 +68,8 @@ export default function EditCoursePage() {
   if (error) {
     return (
       <AdminLayout>
-        <div style={{ padding: '20px', backgroundColor: '#ffffff', minHeight: '100vh' }}>
-          <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
+        <div className="bg-white min-h-screen p-4 md:p-6 lg:p-8">
+          <div className="w-full">
             <div className="edit-course-page">
               <div className="page-header">
                 <button
@@ -101,8 +101,8 @@ export default function EditCoursePage() {
 
   return (
     <AdminLayout>
-      <div style={{ padding: '20px', backgroundColor: '#ffffff', minHeight: '100vh' }}>
-        <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
+      <div className="bg-white min-h-screen p-4 md:p-6 lg:p-8">
+        <div className="w-full">
           <div className="edit-course-page">
             <div className="page-header">
               <button

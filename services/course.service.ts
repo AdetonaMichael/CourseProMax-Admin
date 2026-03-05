@@ -3,12 +3,22 @@
 import { apiClient } from './api-client'
 
 // Types
+export interface Category {
+  id: number
+  name: string
+  slug: string
+  description: string
+  icon: string
+  color: string
+}
+
 export interface CourseListItem {
   id: number
   title: string
   description: string
   category_id: number
   category_name: string
+  category?: Category  // Full category object from full-profile endpoint
   instructor_name: string
   level: 'Beginner' | 'Intermediate' | 'Advanced'
   price: number
@@ -16,10 +26,18 @@ export interface CourseListItem {
   thumbnail?: string
   is_active: boolean
   rating: number
-  total_students: number
+  total_students?: number
+  students_count?: number  // Backend returns this field
   total_lessons: number
   created_at: string
   updated_at: string
+  // Pricing fields from backend
+  is_free?: boolean
+  is_paid?: boolean
+  price_kobo?: number
+  price_naira?: number
+  price_display?: string
+  currency?: string
 }
 
 export interface Course extends CourseListItem {
@@ -44,57 +62,53 @@ export interface Lesson {
 }
 
 export interface Student {
-  id: number
+  enrollment_id: number
   user_id: number
-  course_id: number
-  user: {
-    id: number
-    first_name: string
-    last_name: string
-    email: string
-    phone?: string
-  }
+  user_name: string
+  user_email: string
+  user_phone?: string
+  enrolled_at: string
   status: 'active' | 'paused' | 'completed' | 'withdrawn'
-  progress_percentage: number
+  progress: number
   lessons_completed: number
-  total_lessons: number
   completion_date?: string
-  created_at: string
-  updated_at: string
 }
 
 export interface Review {
   id: number
   user_id: number
-  course_id: number
-  user: {
-    id: number
-    first_name: string
-    last_name: string
-    email: string
-  }
+  user_name: string
+  user_email: string
   rating: number
   comment: string
+  status: string
   helpful_count: number
-  status?: string
   created_at: string
   updated_at: string
 }
 
 export interface Analytics {
   total_enrollments: number
-  active_students: number
-  completed_students: number
-  paused_students: number
-  withdrawn_students: number
+  enrollments_by_status: {
+    active: number
+    completed: number
+    paused: number
+    withdrawn: number
+  }
   average_completion_percentage: number
+  completion_rate: number
   total_revenue: number
+  revenue_per_student: number
 }
 
 export interface CourseFullProfile extends Course {
   lessons?: Lesson[]
   students?: {
     total: number
+    active: number
+    completed: number
+    paused: number
+    withdrawn: number
     data: Student[]
   }
   reviews?: {
@@ -206,10 +220,26 @@ class CourseService {
   ): Promise<CourseFullProfile> {
     try {
       const includeParam = includes?.length ? includes.join(',') : 'all'
+      console.log('[CourseService] Fetching full course profile from backend:', {
+        courseId,
+        endpoint: `/admin/courses/${courseId}/full-profile`,
+        includes: includeParam,
+      })
       const response = await apiClient.get(`/admin/courses/${courseId}/full-profile`, {
         params: { includes: includeParam },
       })
-      return response.data.data.course
+      const courseData = response.data.data.course
+      console.log('[CourseService] Course profile received from backend:', {
+        id: courseData.id,
+        title: courseData.title,
+        price: courseData.price,
+        price_naira: courseData.price_naira,
+        is_free: courseData.is_free,
+        is_paid: courseData.is_paid,
+        price_display: courseData.price_display,
+        updated_at: courseData.updated_at,
+      })
+      return courseData
     } catch (error) {
       console.error(`Failed to fetch course full profile ${courseId}:`, error)
       throw error
@@ -241,12 +271,36 @@ class CourseService {
   // ----- UPDATE COURSE PRICE -----
   async updateCoursePricing(courseId: number, price: number): Promise<Course> {
     try {
-      const response = await apiClient.put(`/admin/courses/${courseId}/pricing`, {
-        price_naira: price,
-      })
-      return response.data.data.course
-    } catch (error) {
-      console.error(`Failed to update course pricing ${courseId}:`, error)
+      console.log('[CourseService] Updating pricing for course:', courseId)
+      console.log('[CourseService] Price to update (naira):', price)
+      
+      // Try the dedicated pricing endpoint first
+      let response
+      try {
+        console.log('[CourseService] Trying /admin/courses/{courseId}/pricing endpoint...')
+        response = await apiClient.put(`/admin/courses/${courseId}/pricing`, {
+          price_naira: price,
+        })
+        console.log('[CourseService] Pricing endpoint success:', response.data)
+      } catch (pricingEndpointError: any) {
+        console.warn('[CourseService] Pricing endpoint failed, trying main course update endpoint...')
+        console.warn('[CourseService] Pricing endpoint error:', pricingEndpointError.message)
+        
+        // Fallback: try the main course update endpoint with price
+        response = await apiClient.put(`/admin/courses/${courseId}`, {
+          price_naira: price,
+        })
+        console.log('[CourseService] Main endpoint success:', response.data)
+      }
+      
+      const updatedCourse = response.data.data?.course || response.data.data
+      console.log('[CourseService] Updated course data:', updatedCourse)
+      return updatedCourse
+    } catch (error: any) {
+      console.error(`[CourseService] Failed to update course pricing ${courseId}:`, error)
+      console.error('[CourseService] Error response:', error.response?.data)
+      console.error('[CourseService] Error message:', error.message)
+      console.error('[CourseService] Error status:', error.status || error.response?.status)
       throw error
     }
   }

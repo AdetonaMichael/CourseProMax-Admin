@@ -1,8 +1,8 @@
 .course-form {
-  max-width: 900px;
+  width: 100%;
   background: #ffffff;
   border-radius: 8px;
-  padding: 32px;
+  padding: 24px 16px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
 }
 
@@ -225,5 +225,12 @@
 
   .form-hint {
     text-align: center;
+  }
+}
+
+/* Desktop adjustments */
+@media (min-width: 1024px) {
+  .course-form {
+    padding: 32px;
   }
 }

@@ -18,7 +18,8 @@ export function UpdatePriceModal({
   onClose,
   onSuccess,
 }: UpdatePriceModalProps) {
-  const [price, setPrice] = useState<number>(currentPrice)
+  const sanitizedPrice = !isNaN(Number(currentPrice)) ? Number(currentPrice) : 0
+  const [price, setPrice] = useState<number>(sanitizedPrice)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -31,10 +32,29 @@ export function UpdatePriceModal({
     try {
       setLoading(true)
       setError(null)
-      await courseService.updateCoursePricing(parseInt(courseId), price)
+      console.log('[UpdatePriceModal] Attempting to update price:', { courseId, newPrice: price, currentPrice })
+      
+      const result = await courseService.updateCoursePricing(parseInt(courseId), price)
+      
+      console.log('[UpdatePriceModal] Update successful, result:', result)
+      console.log('[UpdatePriceModal] Returned price_naira:', result.price_naira)
+      console.log('[UpdatePriceModal] Returned price_display:', result.price_display)
+      
+      // Verify the price was actually updated (check price_naira from backend)
+      if (result.price_naira !== price) {
+        console.warn('[UpdatePriceModal] WARNING: Backend price_naira does not match requested price!', {
+          requested: price,
+          returned: result.price_naira
+        })
+      }
+      
+      // Update succeeded - close modal and refresh page
       onSuccess(price)
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to update price')
+      console.error('[UpdatePriceModal] Error details:', err)
+      const errorMessage = err.message || err.response?.data?.message || 'Failed to update price'
+      console.error('[UpdatePriceModal] Error message:', errorMessage)
+      setError(errorMessage)
     } finally {
       setLoading(false)
     }
@@ -63,22 +83,23 @@ export function UpdatePriceModal({
             <input
               type="number"
               id="price"
-              value={price}
-              onChange={(e) => setPrice(parseFloat(e.target.value))}
+              value={price.toString()}
+              onChange={(e) => setPrice(parseFloat(e.target.value) || 0)}
               min="0"
               step="100"
               disabled={loading}
+              style={{ color: '#1f2937' }}
             />
           </div>
 
-          <p className="price-note">Current price: ₦{currentPrice.toLocaleString()}</p>
+          <p className="price-note">Current price: ₦{Number(currentPrice).toLocaleString()}</p>
         </div>
 
         <div className="modal-footer">
           <button onClick={onClose} disabled={loading} className="btn-secondary">
             Cancel
           </button>
-          <button onClick={handleSubmit} disabled={loading} className="btn-primary">
+          <button onClick={handleSubmit} disabled={loading} className="btn-primary" style={{ backgroundColor: '#000000', color: '#ffffff' }}>
             {loading ? 'Updating...' : 'Update Price'}
           </button>
         </div>

@@ -153,7 +153,8 @@
   font-size: 14px;
   border: 1px solid #d1d5db;
   border-radius: 6px;
-  background-color: #fafafa;
+  background-color: #ffffff;
+  color: #1f2937;
   transition: all 0.2s ease;
   font-family: inherit;
 }
@@ -202,6 +203,12 @@
 .btn-primary:hover:not(:disabled) {
   background-color: #2563eb;
   box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+/* Allow inline style overrides for black button */
+.btn-primary[style*="background-color: #000000"]:hover:not(:disabled) {
+  background-color: #1f2937 !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
 .btn-secondary {
