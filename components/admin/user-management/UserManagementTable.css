@@ -1,0 +1,559 @@
+/* User Management Table */
+.user-management-table {
+  background: white;
+  border-radius: 8px;
+  padding: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+}
+
+/* Table Wrapper */
+.table-wrapper {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border-radius: 6px;
+  margin-bottom: 16px;
+  border: 1px solid #e2e8f0;
+}
+
+.users-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.users-table thead {
+  background: #f7fafc;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.users-table th {
+  padding: 12px 14px;
+  text-align: left;
+  font-weight: 600;
+  color: #2d3748;
+  white-space: nowrap;
+  font-size: 12px;
+}
+
+.users-table th.sortable {
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.2s;
+}
+
+.users-table th.sortable:hover {
+  background: #eef2f5;
+}
+
+.users-table tbody tr {
+  border-bottom: 1px solid #e2e8f0;
+  transition: background 0.15s ease;
+}
+
+.users-table tbody tr:hover {
+  background: #f7fafc;
+}
+
+/* Table Cells */
+.users-table td {
+  padding: 12px 14px;
+  color: #2d3748;
+  font-size: 13px;
+}
+
+.checkbox-col {
+  width: 40px;
+  padding: 12px 8px;
+  text-align: center;
+}
+
+.checkbox-col input {
+  cursor: pointer;
+  width: 18px;
+  height: 18px;
+}
+
+.email-col {
+  font-weight: 600;
+  color: #3182ce;
+  word-break: break-word;
+  min-width: 150px;
+}
+
+.name-col {
+  font-weight: 500;
+  min-width: 120px;
+}
+
+.roles-col {
+  min-width: 140px;
+}
+
+.role-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.role-badge {
+  display: inline-block;
+  background: #e0e7ff;
+  color: #3730a3;
+  padding: 3px 8px;
+  border-radius: 10px;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.2px;
+  white-space: nowrap;
+}
+
+.status-col {
+  min-width: 100px;
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: capitalize;
+  letter-spacing: 0.2px;
+}
+
+.status-active {
+  background: #c6f6d5;
+  color: #22543d;
+}
+
+.status-inactive {
+  background: #feebc8;
+  color: #7c2d12;
+}
+
+.status-blocked {
+  background: #fed7d7;
+  color: #742a2a;
+}
+
+.phone-col {
+  color: #718096;
+  min-width: 120px;
+  display: none;
+}
+
+.date-col {
+  color: #718096;
+  font-size: 12px;
+  white-space: nowrap;
+  min-width: 100px;
+}
+
+/* Actions Column */
+.actions-col {
+  min-width: 120px;
+  text-align: center;
+  padding: 12px 8px;
+}
+
+.action-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 2px;
+  flex-wrap: wrap;
+}
+
+.btn-icon {
+  background: none;
+  border: 1px solid #e2e8f0;
+  width: 28px;
+  height: 28px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  padding: 0;
+  flex-shrink: 0;
+}
+
+.btn-icon:hover {
+  border-color: #cbd5e0;
+  background: #f7fafc;
+  transform: scale(1.05);
+}
+
+.btn-icon.btn-view:hover {
+  border-color: #3182ce;
+  background: #ebf8ff;
+}
+
+.btn-icon.btn-role:hover {
+  border-color: #9f7aea;
+  background: #faf5ff;
+}
+
+.btn-icon.btn-block:hover {
+  border-color: #ed8936;
+  background: #fffaf0;
+}
+
+.btn-icon.btn-block.active {
+  border-color: #ed8936;
+  background: #fed7d7;
+}
+
+.btn-icon.btn-delete:hover {
+  border-color: #f56565;
+  background: #fff5f5;
+}
+
+/* Pagination */
+.pagination-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px;
+  background: #f7fafc;
+  border-radius: 6px;
+  border: 1px solid #e2e8f0;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.pagination-info {
+  font-size: 12px;
+  color: #718096;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.pagination-controls {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.btn-pagination {
+  padding: 6px 10px;
+  border: 1px solid #cbd5e0;
+  background: white;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+  color: #2d3748;
+  transition: all 0.2s;
+  min-width: 35px;
+}
+
+.btn-pagination:hover:not(:disabled) {
+  border-color: #3182ce;
+  background: #ebf8ff;
+  color: #3182ce;
+}
+
+.btn-pagination:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.page-indicator {
+  color: #4a5568;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 0 6px;
+  white-space: nowrap;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .user-management-table {
+    padding: 12px;
+  }
+
+  .users-table {
+    font-size: 12px;
+  }
+
+  .users-table th {
+    padding: 10px 10px;
+    font-size: 11px;
+  }
+
+  .users-table td {
+    padding: 10px 10px;
+    font-size: 12px;
+  }
+
+  .role-badge {
+    padding: 2px 6px;
+    font-size: 9px;
+  }
+
+  .status-badge {
+    padding: 3px 8px;
+    font-size: 10px;
+  }
+
+  .btn-icon {
+    width: 26px;
+    height: 26px;
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 768px) {
+  .user-management-table {
+    padding: 12px;
+  }
+
+  .table-wrapper {
+    overflow-x: auto;
+    margin-bottom: 12px;
+    border-radius: 4px;
+  }
+
+  .users-table {
+    font-size: 11px;
+    min-width: 700px;
+  }
+
+  .users-table th {
+    padding: 8px 8px;
+    font-size: 10px;
+  }
+
+  .users-table td {
+    padding: 8px 8px;
+    font-size: 11px;
+  }
+
+  .checkbox-col {
+    width: 36px;
+    padding: 8px 4px;
+  }
+
+  .email-col {
+    min-width: 120px;
+    font-size: 11px;
+  }
+
+  .name-col {
+    min-width: 100px;
+  }
+
+  .roles-col {
+    min-width: 80px;
+  }
+
+  .date-col {
+    min-width: 80px;
+    font-size: 10px;
+  }
+
+  .role-badge {
+    padding: 2px 4px;
+    font-size: 8px;
+  }
+
+  .status-badge {
+    padding: 2px 6px;
+    font-size: 9px;
+  }
+
+  .actions-col {
+    min-width: 80px;
+    padding: 8px 4px;
+  }
+
+  .action-buttons {
+    gap: 1px;
+  }
+
+  .btn-icon {
+    width: 24px;
+    height: 24px;
+    font-size: 11px;
+    border-radius: 3px;
+  }
+
+  .pagination-bar {
+    padding: 10px;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+
+  .pagination-info {
+    font-size: 11px;
+    text-align: center;
+  }
+
+  .pagination-controls {
+    width: 100%;
+    justify-content: center;
+    gap: 4px;
+  }
+
+  .btn-pagination {
+    padding: 4px 8px;
+    font-size: 10px;
+    min-width: 30px;
+  }
+
+  .page-indicator {
+    font-size: 10px;
+    padding: 0 4px;
+  }
+}
+
+@media (max-width: 480px) {
+  .user-management-table {
+    padding: 8px;
+    border-radius: 6px;
+  }
+
+  .table-wrapper {
+    border-radius: 4px;
+    margin-bottom: 8px;
+    border: 1px solid #e2e8f0;
+  }
+
+  .users-table {
+    font-size: 10px;
+    min-width: 600px;
+  }
+
+  .users-table thead {
+    background: #f7fafc;
+  }
+
+  .users-table th {
+    padding: 6px 6px;
+    font-size: 9px;
+    font-weight: 600;
+  }
+
+  .users-table td {
+    padding: 6px 6px;
+    font-size: 10px;
+  }
+
+  .checkbox-col {
+    width: 32px;
+    padding: 6px 2px;
+  }
+
+  .checkbox-col input {
+    width: 16px;
+    height: 16px;
+  }
+
+  .email-col {
+    min-width: 100px;
+    font-size: 10px;
+  }
+
+  .name-col {
+    min-width: 80px;
+    font-size: 10px;
+  }
+
+  .roles-col {
+    min-width: 60px;
+  }
+
+  .phone-col {
+    display: none;
+  }
+
+  .date-col {
+    min-width: 70px;
+    font-size: 9px;
+  }
+
+  .role-badges {
+    gap: 2px;
+  }
+
+  .role-badge {
+    padding: 1px 3px;
+    font-size: 7px;
+    border-radius: 3px;
+  }
+
+  .status-badge {
+    padding: 2px 4px;
+    font-size: 8px;
+    border-radius: 3px;
+  }
+
+  .actions-col {
+    min-width: 60px;
+    padding: 6px 2px;
+  }
+
+  .action-buttons {
+    gap: 1px;
+    flex-direction: row;
+  }
+
+  .btn-icon {
+    width: 20px;
+    height: 20px;
+    font-size: 10px;
+    border-radius: 2px;
+    border: 1px solid #e2e8f0;
+  }
+
+  .btn-icon:hover {
+    transform: none;
+  }
+
+  .pagination-bar {
+    padding: 8px;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 6px;
+    border-radius: 4px;
+  }
+
+  .pagination-info {
+    font-size: 10px;
+    text-align: center;
+    order: 1;
+  }
+
+  .pagination-controls {
+    width: 100%;
+    justify-content: center;
+    gap: 2px;
+    order: 2;
+  }
+
+  .btn-pagination {
+    padding: 4px 6px;
+    font-size: 9px;
+    min-width: 28px;
+    flex: 0 0 auto;
+  }
+
+  .page-indicator {
+    font-size: 9px;
+    padding: 0 2px;
+  }
+
+  /* Optimize spacing */
+  .users-table tbody tr:hover {
+    background: white;
+  }
+
+  .btn-icon:active {
+    background: #e2e8f0;
+  }
+}

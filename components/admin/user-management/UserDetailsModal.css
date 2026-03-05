@@ -1,0 +1,826 @@
+/* Modal Overlay and Container */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.modal-content {
+  background: white;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 500px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 25px rgba(0, 0, 0, 0.15);
+  animation: slideUp 0.3s ease;
+}
+
+.modal-content.large {
+  max-width: 900px;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Modal Header */
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 20px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.header-info {
+  display: flex;
+  gap: 12px;
+  flex: 1;
+}
+
+.user-avatar-small {
+  width: 50px;
+  height: 50px;
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+.modal-header h2 {
+  font-size: 20px;
+  font-weight: 700;
+  color: #1a202c;
+  margin: 0 0 4px 0;
+}
+
+.modal-header .email {
+  color: #718096;
+  font-size: 13px;
+  margin: 0;
+}
+
+.btn-close {
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: #718096;
+  cursor: pointer;
+  padding: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  transition: all 0.2s;
+}
+
+.btn-close:hover {
+  background: #f7fafc;
+  color: #2d3748;
+}
+
+/* Modal Tabs */
+.modal-tabs {
+  display: flex;
+  gap: 0;
+  padding: 0;
+  border-bottom: 1px solid #e2e8f0;
+  background: #f7fafc;
+  flex-wrap: wrap;
+}
+
+.tab {
+  background: none;
+  border: none;
+  padding: 14px 16px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  color: #718096;
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.tab.active {
+  color: #3182ce;
+  border-bottom-color: #3182ce;
+}
+
+.tab:hover:not(.active) {
+  background: #eef2f5;
+}
+
+/* Modal Body */
+.modal-body {
+  padding: 20px;
+  max-height: calc(90vh - 160px);
+  overflow-y: auto;
+}
+
+.tab-content {
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Profile Tab */
+.profile-tab .info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+}
+
+.info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.info-item label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #718096;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.info-item span {
+  font-size: 14px;
+  color: #2d3748;
+  font-weight: 500;
+}
+
+/* Wallet Tab */
+.wallet-tab .wallet-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.wallet-card {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 16px;
+  border-radius: 8px;
+  color: white;
+}
+
+.wallet-card h4 {
+  font-size: 12px;
+  font-weight: 600;
+  margin: 0 0 8px 0;
+  opacity: 0.9;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.wallet-card .amount {
+  font-size: 20px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.wallet-card.credited {
+  background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+}
+
+.wallet-card.debited {
+  background: linear-gradient(135deg, #f56565 0%, #c53030 100%);
+}
+
+/* Enrollments Tab */
+.enrollments-tab .stats-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.stat {
+  background: #f7fafc;
+  padding: 12px;
+  border-radius: 6px;
+  text-align: center;
+  border: 1px solid #e2e8f0;
+}
+
+.stat .label {
+  display: block;
+  font-size: 12px;
+  color: #718096;
+  margin-bottom: 4px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.stat .value {
+  display: block;
+  font-size: 18px;
+  font-weight: 700;
+  color: #3182ce;
+}
+
+.enrollments-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.enrollment-card {
+  background: #f7fafc;
+  padding: 12px;
+  border-radius: 6px;
+  border: 1px solid #e2e8f0;
+}
+
+.enrollment-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  margin-bottom: 8px;
+}
+
+.enrollment-header h5 {
+  font-size: 14px;
+  font-weight: 600;
+  color: #2d3748;
+  margin: 0;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 6px;
+  background: #e2e8f0;
+  border-radius: 3px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #3182ce, #2c5aa0);
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+.enrollment-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 12px;
+}
+
+.enrollment-info p {
+  margin: 0;
+  display: flex;
+  justify-content: space-between;
+  color: #2d3748;
+}
+
+/* Transactions Tab */
+.transactions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.transaction-item {
+  display: flex;
+  gap: 12px;
+  padding: 12px;
+  background: #f7fafc;
+  border-radius: 6px;
+  border: 1px solid #e2e8f0;
+  align-items: start;
+}
+
+.tx-icon {
+  font-size: 20px;
+  min-width: 24px;
+  text-align: center;
+}
+
+.tx-details {
+  flex: 1;
+  min-width: 0;
+}
+
+.tx-description {
+  font-size: 13px;
+  font-weight: 600;
+  color: #2d3748;
+  margin: 0 0 4px 0;
+  word-break: break-word;
+}
+
+.tx-amount {
+  text-align: right;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.tx-amount .amount {
+  font-size: 13px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.amount.credited {
+  color: #48bb78;
+}
+
+.amount.debited {
+  color: #f56565;
+}
+
+/* Activity Tab */
+.activity-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 12px;
+}
+
+.activity-item {
+  background: #f7fafc;
+  padding: 12px;
+  border-radius: 6px;
+  border: 1px solid #e2e8f0;
+  text-align: center;
+}
+
+.activity-item .label {
+  font-size: 12px;
+  color: #718096;
+  font-weight: 600;
+  margin-bottom: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  display: block;
+}
+
+.activity-item .value {
+  font-size: 18px;
+  font-weight: 700;
+  color: #3182ce;
+  display: block;
+}
+
+/* Modal Footer */
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 16px 20px;
+  border-top: 1px solid #e2e8f0;
+  background: #f7fafc;
+  border-radius: 0 0 12px 12px;
+}
+
+.modal-footer .btn {
+  padding: 8px 14px;
+  font-size: 13px;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .modal-content {
+    max-width: 90%;
+  }
+
+  .modal-header {
+    padding: 16px;
+  }
+
+  .modal-body {
+    padding: 16px;
+    max-height: calc(90vh - 140px);
+  }
+
+  .tab {
+    padding: 12px 14px;
+    font-size: 12px;
+  }
+
+  .profile-tab .info-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .wallet-tab .wallet-cards {
+    grid-template-columns: 1fr;
+  }
+
+  .enrollments-tab .stats-row {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .activity-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .modal-footer {
+    padding: 12px 16px;
+  }
+}
+
+@media (max-width: 768px) {
+  .modal-overlay {
+    padding: 12px;
+  }
+
+  .modal-content {
+    width: 95%;
+    max-width: 100%;
+    max-height: 95vh;
+    border-radius: 8px;
+  }
+
+  .modal-content.large {
+    max-width: 100%;
+  }
+
+  .modal-header {
+    padding: 14px;
+    border-bottom: 1px solid #e2e8f0;
+  }
+
+  .header-info {
+    gap: 10px;
+  }
+
+  .user-avatar-small {
+    width: 44px;
+    height: 44px;
+  }
+
+  .modal-header h2 {
+    font-size: 18px;
+  }
+
+  .modal-header .email {
+    font-size: 12px;
+  }
+
+  .btn-close {
+    width: 28px;
+    height: 28px;
+    font-size: 20px;
+  }
+
+  .modal-tabs {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    flex-wrap: nowrap;
+  }
+
+  .tab {
+    padding: 11px 12px;
+    font-size: 11px;
+    white-space: nowrap;
+  }
+
+  .modal-body {
+    padding: 14px;
+    max-height: calc(95vh - 120px);
+  }
+
+  .info-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .info-item label {
+    font-size: 11px;
+  }
+
+  .info-item span {
+    font-size: 13px;
+  }
+
+  .wallet-tab .wallet-cards {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .wallet-card {
+    padding: 12px;
+  }
+
+  .wallet-card h4 {
+    font-size: 11px;
+    margin-bottom: 6px;
+  }
+
+  .wallet-card .amount {
+    font-size: 18px;
+  }
+
+  .enrollments-tab .stats-row {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+
+  .stat {
+    padding: 10px;
+  }
+
+  .stat .label {
+    font-size: 10px;
+  }
+
+  .stat .value {
+    font-size: 16px;
+  }
+
+  .enrollment-card {
+    padding: 10px;
+  }
+
+  .enrollment-header h5 {
+    font-size: 13px;
+  }
+
+  .enrollment-info {
+    gap: 2px;
+    font-size: 11px;
+  }
+
+  .enrollment-info p {
+    font-size: 11px;
+  }
+
+  .transaction-item {
+    gap: 10px;
+    padding: 10px;
+  }
+
+  .tx-icon {
+    font-size: 18px;
+    min-width: 20px;
+  }
+
+  .tx-description {
+    font-size: 12px;
+  }
+
+  .tx-amount .amount {
+    font-size: 12px;
+  }
+
+  .activity-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+
+  .activity-item {
+    padding: 10px;
+  }
+
+  .activity-item .label {
+    font-size: 10px;
+  }
+
+  .activity-item .value {
+    font-size: 16px;
+  }
+
+  .modal-footer {
+    padding: 12px 14px;
+    gap: 6px;
+  }
+
+  .modal-footer .btn {
+    padding: 6px 12px;
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .modal-overlay {
+    padding: 8px;
+    align-items: flex-end;
+  }
+
+  .modal-content {
+    width: 100%;
+    max-width: 100%;
+    max-height: 90vh;
+    border-radius: 12px 12px 0 0;
+  }
+
+  .modal-header {
+    padding: 12px;
+    flex-direction: column;
+  }
+
+  .header-info {
+    width: 100%;
+    gap: 10px;
+  }
+
+  .user-avatar-small {
+    width: 40px;
+    height: 40px;
+  }
+
+  .modal-header h2 {
+    font-size: 16px;
+  }
+
+  .modal-header .email {
+    font-size: 11px;
+    color: #718096;
+  }
+
+  .btn-close {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 28px;
+    height: 28px;
+    font-size: 18px;
+  }
+
+  .modal-tabs {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scroll-snap-type: x mandatory;
+  }
+
+  .tab {
+    padding: 10px 10px;
+    font-size: 10px;
+    white-space: nowrap;
+    scroll-snap-align: start;
+  }
+
+  .tab.active {
+    border-bottom-width: 2px;
+  }
+
+  .modal-body {
+    padding: 12px;
+    max-height: calc(90vh - 100px);
+    overflow-y: auto;
+  }
+
+  .info-item {
+    gap: 2px;
+  }
+
+  .info-item label {
+    font-size: 10px;
+  }
+
+  .info-item span {
+    font-size: 12px;
+  }
+
+  .profile-tab .info-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .wallet-tab .wallet-cards {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .wallet-card {
+    padding: 10px;
+  }
+
+  .wallet-card h4 {
+    font-size: 10px;
+    margin-bottom: 4px;
+  }
+
+  .wallet-card .amount {
+    font-size: 16px;
+  }
+
+  .enrollments-tab .stats-row {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+
+  .stat {
+    padding: 8px;
+  }
+
+  .stat .label {
+    font-size: 9px;
+  }
+
+  .stat .value {
+    font-size: 14px;
+  }
+
+  .enrollment-card {
+    padding: 8px;
+    gap: 6px;
+  }
+
+  .enrollment-header {
+    margin-bottom: 6px;
+  }
+
+  .enrollment-header h5 {
+    font-size: 12px;
+  }
+
+  .progress-bar {
+    height: 5px;
+    margin-bottom: 6px;
+  }
+
+  .enrollment-info {
+    gap: 1px;
+    font-size: 10px;
+  }
+
+  .enrollment-info p {
+    font-size: 10px;
+  }
+
+  .transaction-item {
+    gap: 8px;
+    padding: 8px;
+  }
+
+  .tx-icon {
+    font-size: 16px;
+    min-width: 18px;
+  }
+
+  .tx-details {
+    gap: 2px;
+  }
+
+  .tx-description {
+    font-size: 11px;
+  }
+
+  .tx-amount {
+    gap: 2px;
+  }
+
+  .tx-amount .amount {
+    font-size: 11px;
+  }
+
+  .activity-grid {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .activity-item {
+    padding: 8px;
+  }
+
+  .activity-item .label {
+    font-size: 9px;
+  }
+
+  .activity-item .value {
+    font-size: 14px;
+  }
+
+  .modal-footer {
+    padding: 10px 12px;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  .modal-footer .btn {
+    padding: 6px 10px;
+    font-size: 11px;
+    flex: 1;
+    min-width: 60px;
+  }
+}
