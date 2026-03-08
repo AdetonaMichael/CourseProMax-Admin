@@ -2,6 +2,7 @@
 
 import React from 'react'
 import { Search, RotateCcw } from 'lucide-react'
+import { Button } from '@/components/shared/Button'
 import './CourseFiltersBar.css'
 
 interface CourseFiltersBarProps {
@@ -74,20 +75,21 @@ export default function CourseFiltersBar({
           </select>
         </div>
 
-        <button
+        <Button
           type="submit"
-          className="btn-apply"
+          variant="primary"
+          size="sm"
           disabled={loading}
         >
           Apply
-        </button>
+        </Button>
 
         <button
           type="button"
           onClick={onReset}
-          className="btn-reset"
           disabled={loading}
           title="Reset filters"
+          className="text-gray-600 hover:text-gray-900 p-2"
         >
           <RotateCcw size={16} />
         </button>

@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react'
 import { X, Mail, User, Phone, Lock } from 'lucide-react'
+import { Button } from '@/components/shared/Button'
 import { createUser, handleAPIError } from '@/services/admin.service'
 import './AddUserModal.css'
 
@@ -239,21 +240,21 @@ export default function AddUserModal({ isOpen, onClose, onUserCreated }: AddUser
           </div>
 
           <div className="modal-footer">
-            <button
+            <Button
               type="button"
-              className="btn btn-secondary"
+              variant="secondary"
               onClick={onClose}
               disabled={loading}
             >
               Cancel
-            </button>
-            <button
+            </Button>
+            <Button
               type="submit"
-              className="btn btn-primary"
-              disabled={loading}
+              variant="primary"
+              isLoading={loading}
             >
-              {loading ? 'Creating...' : 'Create User'}
-            </button>
+              Create User
+            </Button>
           </div>
         </form>
       </div>

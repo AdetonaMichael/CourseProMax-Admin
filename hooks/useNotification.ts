@@ -3,48 +3,60 @@
 import { useUIStore } from '@/store/ui.store'
 import { useCallback } from 'react'
 
+export interface AlertOptions {
+  duration?: number
+  action?: {
+    label: string
+    onClick: () => void
+  }
+}
+
 export function useNotification() {
   const addToast = useUIStore((state) => state.addToast)
 
   const success = useCallback(
-    (message: string, duration = 3000) => {
-      addToast({
+    (message: string, options?: AlertOptions) => {
+      return addToast({
         type: 'success',
         message,
-        duration,
+        duration: options?.duration ?? 3000,
+        action: options?.action,
       })
     },
     [addToast]
   )
 
   const error = useCallback(
-    (message: string, duration = 5000) => {
-      addToast({
+    (message: string, options?: AlertOptions) => {
+      return addToast({
         type: 'error',
         message,
-        duration,
+        duration: options?.duration ?? 5000,
+        action: options?.action,
       })
     },
     [addToast]
   )
 
   const info = useCallback(
-    (message: string, duration = 3000) => {
-      addToast({
+    (message: string, options?: AlertOptions) => {
+      return addToast({
         type: 'info',
         message,
-        duration,
+        duration: options?.duration ?? 3000,
+        action: options?.action,
       })
     },
     [addToast]
   )
 
   const warning = useCallback(
-    (message: string, duration = 4000) => {
-      addToast({
+    (message: string, options?: AlertOptions) => {
+      return addToast({
         type: 'warning',
         message,
-        duration,
+        duration: options?.duration ?? 4000,
+        action: options?.action,
       })
     },
     [addToast]

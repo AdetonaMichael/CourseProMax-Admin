@@ -136,6 +136,11 @@ export default function CourseTable({
                           <Edit2 size={16} />
                         </button>
                       </Link>
+                      <Link href={`/admin/courses/${course.id}/lessons`} title="Manage lessons">
+                        <button className="btn-action btn-lessons">
+                          Manage Lessons
+                        </button>
+                      </Link>
                     </div>
                   </td>
                 </tr>

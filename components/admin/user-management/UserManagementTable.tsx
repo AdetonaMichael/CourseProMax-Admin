@@ -19,6 +19,9 @@ import {
   type UsersResponse,
   handleAPIError,
 } from '@/services/admin.service'
+import { useNotification } from '@/hooks/useNotification'
+import { useConfirmation } from '@/components/shared/ConfirmationDialog'
+import { usePrompt } from '@/components/shared/PromptDialog'
 import UserDetailsSideDrawer from './UserDetailsSideDrawer'
 import UserFiltersBar from './UserFiltersBar'
 import './UserManagementTable.css'
@@ -37,6 +40,9 @@ interface UserManagementTableProps {
 }
 
 export default function UserManagementTable({ onDataChange }: UserManagementTableProps) {
+  const notification = useNotification()
+  const { confirm } = useConfirmation()
+  const { prompt } = usePrompt()
   const [users, setUsers] = useState<any[]>([])
   const [pagination, setPagination] = useState({
     current_page: 1,
@@ -98,7 +104,15 @@ export default function UserManagementTable({ onDataChange }: UserManagementTabl
   }
 
   const handleDeleteUser = async (userId: number) => {
-    if (!window.confirm('Are you sure you want to delete this user? This action cannot be undone.')) {
+    const confirmed = await confirm({
+      title: 'Delete User',
+      description: 'Are you sure you want to delete this user? This action cannot be undone.',
+      confirmText: 'Delete',
+      cancelText: 'Cancel',
+      isDangerous: true,
+    })
+
+    if (!confirmed) {
       return
     }
 
@@ -106,9 +120,9 @@ export default function UserManagementTable({ onDataChange }: UserManagementTabl
       await deleteUser(userId)
       await loadUsers()
       onDataChange?.()
-      alert('User deleted successfully')
+      notification.success('User deleted successfully')
     } catch (err: any) {
-      alert('Error deleting user: ' + (err.message || 'Unknown error'))
+      notification.error('Error deleting user: ' + (err.message || 'Unknown error'))
     }
   }
 
@@ -119,32 +133,40 @@ export default function UserManagementTable({ onDataChange }: UserManagementTabl
         await unblockUser(userId)
         await loadUsers()
         onDataChange?.()
-        alert('User unblocked successfully')
+        notification.success('User unblocked successfully')
       } catch (err: any) {
-        alert('Error unblocking user: ' + (err.message || 'Unknown error'))
+        notification.error('Error unblocking user: ' + (err.message || 'Unknown error'))
       }
     } else {
       // Block
-      const reason = prompt('Enter reason for blocking (optional):')
+      const reason = await prompt({
+        title: 'Block User',
+        message: 'Enter reason for blocking (optional):',
+        placeholder: 'e.g., Violating community guidelines',
+      })
       if (reason === null) return
 
       try {
         await blockUser(userId, reason || 'No reason provided')
         await loadUsers()
         onDataChange?.()
-        alert('User blocked successfully')
+        notification.success('User blocked successfully')
       } catch (err: any) {
-        alert('Error blocking user: ' + (err.message || 'Unknown error'))
+        notification.error('Error blocking user: ' + (err.message || 'Unknown error'))
       }
     }
   }
 
   const handleChangeRole = async (userId: number) => {
     const availableRoles = ['student', 'instructor', 'admin', 'moderator']
-    const roleInput = prompt(`Available roles: ${availableRoles.join(', ')}\n\nEnter role to assign:`)
+    const roleInput = await prompt({
+      title: 'Assign Role',
+      message: `Available roles: ${availableRoles.join(', ')}`,
+      placeholder: 'Enter role to assign',
+    })
 
     if (!roleInput || !availableRoles.includes(roleInput.toLowerCase())) {
-      alert('Invalid role selected')
+      notification.error('Invalid role selected')
       return
     }
 
@@ -152,9 +174,9 @@ export default function UserManagementTable({ onDataChange }: UserManagementTabl
       await assignRoleToUser(userId, [roleInput.toLowerCase()])
       await loadUsers()
       onDataChange?.()
-      alert('Role assigned successfully')
+      notification.success('Role assigned successfully')
     } catch (err: any) {
-      alert('Error assigning role: ' + (err.message || 'Unknown error'))
+      notification.error('Error assigning role: ' + (err.message || 'Unknown error'))
     }
   }
 

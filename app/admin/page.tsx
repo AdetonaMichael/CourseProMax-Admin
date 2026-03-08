@@ -15,6 +15,7 @@ import {
   Course,
   Enrollment,
 } from '@/services/admin.service';
+import { Users, BookOpen, CheckCircle, TrendingUp, AlertCircle } from 'lucide-react';
 
 export default function AdminDashboard() {
   const { data: session, status } = useSession();
@@ -90,7 +91,7 @@ export default function AdminDashboard() {
     return (
       <AdminLayout>
         <EmptyState
-          icon="⚠️"
+          icon={<AlertCircle className="w-12 h-12 text-red-400 mx-auto" />}
           title="Error Loading Dashboard"
           description={error.message}
           action={{
@@ -106,25 +107,25 @@ export default function AdminDashboard() {
     {
       title: 'Total Users',
       value: stats?.total_enrollments || users.length,
-      icon: '👥',
+      icon: <Users className="w-8 h-8 text-blue-500" />,
       description: 'Active users on platform',
     },
     {
       title: 'Active Courses',
       value: courses.length,
-      icon: '📚',
+      icon: <BookOpen className="w-8 h-8 text-green-500" />,
       description: 'Published courses',
     },
     {
       title: 'Total Enrollments',
       value: stats?.total_enrollments || enrollments.length,
-      icon: '✅',
+      icon: <CheckCircle className="w-8 h-8 text-purple-500" />,
       description: 'Course enrollments',
     },
     {
       title: 'Completion Rate',
       value: `${stats?.completion_rate || 0}%`,
-      icon: '📈',
+      icon: <TrendingUp className="w-8 h-8 text-orange-500" />,
       description: 'Average completion',
     },
   ];
@@ -309,7 +310,7 @@ export default function AdminDashboard() {
           />
         ) : (
           <EmptyState
-            icon="👥"
+            icon={<Users className="w-12 h-12 text-gray-400 mx-auto" />}
             title="No Users Yet"
             description="Users will appear here once they sign up"
           />
@@ -339,7 +340,7 @@ export default function AdminDashboard() {
               {
                 key: 'rating',
                 label: 'Rating',
-                render: (rating) => `⭐ ${rating.toFixed(1)}`,
+                render: (rating) => `${rating.toFixed(1)} ⭐`,
               },
             ]}
             data={courses}
@@ -352,7 +353,7 @@ export default function AdminDashboard() {
           />
         ) : (
           <EmptyState
-            icon="📚"
+            icon={<BookOpen className="w-12 h-12 text-gray-400 mx-auto" />}
             title="No Courses Yet"
             description="Create your first course to get started"
           />
@@ -412,7 +413,7 @@ export default function AdminDashboard() {
           />
         ) : (
           <EmptyState
-            icon="✅"
+            icon={<CheckCircle className="w-12 h-12 text-gray-400 mx-auto" />}
             title="No Enrollments Yet"
             description="Enrollments will appear here"
           />

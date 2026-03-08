@@ -5,15 +5,25 @@ import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import { useAuth } from '@/hooks/useAuth'
 import { Button } from '@/components/shared/Button'
+import {
+  LayoutDashboard,
+  Users,
+  BookOpen,
+  ClipboardList,
+  Folder,
+  BarChart3,
+  Settings,
+  LogOut,
+} from 'lucide-react'
 
 const ADMIN_MENU_ITEMS = [
-  { label: 'Dashboard', href: '/admin', icon: '📊' },
-  { label: 'Users', href: '/admin/users', icon: '👥' },
-  { label: 'Courses', href: '/admin/courses', icon: '📚' },
-  { label: 'Enrollments', href: '/admin/enrollments', icon: '📋' },
-  { label: 'Categories', href: '/admin/categories', icon: '📁' },
-  { label: 'Analytics', href: '/admin/analytics', icon: '📈' },
-  { label: 'Settings', href: '/admin/settings', icon: '⚙️' },
+  { label: 'Dashboard', href: '/admin', icon: LayoutDashboard },
+  { label: 'Users', href: '/admin/users', icon: Users },
+  { label: 'Courses', href: '/admin/courses', icon: BookOpen },
+  { label: 'Enrollments', href: '/admin/enrollments', icon: ClipboardList },
+  { label: 'Categories', href: '/admin/categories', icon: Folder },
+  { label: 'Analytics', href: '/admin/analytics', icon: BarChart3 },
+  { label: 'Settings', href: '/admin/settings', icon: Settings },
 ]
 
 export function AdminSidebar() {
@@ -40,6 +50,7 @@ export function AdminSidebar() {
       <nav className="flex-1 space-y-2 px-4 py-6 overflow-y-auto">
         {ADMIN_MENU_ITEMS.map((item) => {
           const isActive = pathname === item.href || pathname.startsWith(item.href + '/')
+          const Icon = item.icon
           return (
             <Link
               key={item.href}
@@ -50,7 +61,7 @@ export function AdminSidebar() {
                   : 'text-gray-300 hover:bg-gray-800'
               }`}
             >
-              <span className="text-lg">{item.icon}</span>
+              <Icon className="w-5 h-5" />
               <span>{item.label}</span>
             </Link>
           )
@@ -64,6 +75,7 @@ export function AdminSidebar() {
           size="md"
           className="w-full"
         >
+          <LogOut className="w-4 h-4 mr-2" />
           Logout
         </Button>
       </div>

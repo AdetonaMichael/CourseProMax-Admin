@@ -14,6 +14,8 @@ import {
   MakeFreeModal,
   DeleteCourseModal,
 } from '@/components/admin/course-management/PricingModals'
+import { LessonEditor } from '@/components/admin/course-management/LessonEditor'
+import { LessonList } from '@/components/admin/course-management/LessonList'
 
 interface CourseDetailsPageProps {
   params: Promise<{
@@ -34,6 +36,7 @@ export default function CourseDetailsPage({ params }: CourseDetailsPageProps) {
   const [showPriceModal, setShowPriceModal] = useState(false)
   const [showFreeModal, setShowFreeModal] = useState(false)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
+  const [showAddLesson, setShowAddLesson] = useState(false)
 
   useEffect(() => {
     loadCourse()
@@ -86,6 +89,10 @@ export default function CourseDetailsPage({ params }: CourseDetailsPageProps) {
 
   const handleDeleteSuccess = () => {
     router.push('/admin/courses')
+  }
+
+  const toggleAddLesson = () => {
+    setShowAddLesson((prev) => !prev)
   }
 
   if (loading) {
@@ -303,40 +310,23 @@ export default function CourseDetailsPage({ params }: CourseDetailsPageProps) {
               {/* Lessons Tab */}
               {activeTab === 'lessons' && (
                 <div>
-                  {course.lessons && course.lessons.length > 0 ? (
-                    <div className="space-y-3">
-                      {course.lessons.map((lesson) => (
-                        <div key={lesson.id} className="flex gap-4 items-start p-4 bg-white border border-gray-200 rounded-lg hover:border-gray-400 hover:shadow-md transition">
-                          <div className="flex items-center justify-center w-10 h-10 bg-gray-100 border-2 border-gray-300 rounded-lg font-bold text-gray-700 flex-shrink-0">
-                            {lesson.order}
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <h4 className="font-bold text-black text-sm mb-1">{lesson.title}</h4>
-                            <p className="text-xs text-gray-600 mb-3 line-clamp-2">{lesson.description}</p>
-                            <div className="flex flex-wrap gap-2">
-                              <span className="px-2 py-1 bg-gray-100 border border-gray-300 rounded text-xs text-gray-700 font-semibold">
-                                {lesson.estimated_duration_minutes}m
-                              </span>
-                              <span className={`px-2 py-1 rounded text-xs font-semibold border ${lesson.difficulty === 'Beginner' ? 'bg-green-100 text-green-800 border-green-300' : lesson.difficulty === 'Intermediate' ? 'bg-yellow-100 text-yellow-800 border-yellow-300' : 'bg-red-100 text-red-800 border-red-300'}`}>
-                                {lesson.difficulty}
-                              </span>
-                              <span className={`px-2 py-1 rounded text-xs font-semibold ${lesson.is_active ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-700'}`}>
-                                {lesson.is_active ? 'Active' : 'Inactive'}
-                              </span>
-                              {lesson.is_preview && <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs font-semibold">Preview</span>}
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="text-center py-16">
-                      <p className="text-gray-600 mb-4">No lessons added yet</p>
-                      <Button variant="primary" disabled>
-                        Add Lesson
-                      </Button>
+                  <div className="flex justify-between items-center mb-4">
+                    <h2 className="text-lg font-semibold">Lessons</h2>
+                    <button
+                      onClick={toggleAddLesson}
+                      className="px-4 py-2 bg-black text-white rounded hover:bg-gray-800 transition"
+                    >
+                      {showAddLesson ? 'Cancel' : 'Add Lesson'}
+                    </button>
+                  </div>
+
+                  {showAddLesson && (
+                    <div className="mb-4">
+                      <LessonEditor courseId={courseId} onClose={toggleAddLesson} />
                     </div>
                   )}
+
+                  <LessonList lessons={course.lessons || []} courseId={courseId} hideAddButton={true} />
                 </div>
               )}
 
@@ -529,6 +519,10 @@ export default function CourseDetailsPage({ params }: CourseDetailsPageProps) {
           onClose={() => setShowDeleteModal(false)}
           onSuccess={handleDeleteSuccess}
         />
+      )}
+
+      {showAddLesson && (
+        <LessonEditor courseId={courseId} onClose={toggleAddLesson} />
       )}
     </AdminLayout>
   )

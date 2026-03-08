@@ -11,6 +11,7 @@ import {
   handleAPIError,
   type Category,
 } from '@/services/admin.service'
+import { useConfirmation } from '@/components/shared/ConfirmationDialog'
 
 interface FormData {
   name: string
@@ -49,6 +50,7 @@ const PRESET_COLORS = [
 ]
 
 export default function CategoriesPage() {
+  const { confirm } = useConfirmation()
   const [categories, setCategories] = useState<Category[]>([])
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -202,7 +204,15 @@ export default function CategoriesPage() {
   }
 
   const handleDelete = async (categoryId: number) => {
-    if (!confirm('Are you sure you want to delete this category?')) {
+    const confirmed = await confirm({
+      title: 'Delete Category',
+      description: 'Are you sure you want to delete this category? This action cannot be undone.',
+      confirmText: 'Delete',
+      cancelText: 'Cancel',
+      isDangerous: true,
+    })
+
+    if (!confirmed) {
       return
     }
 

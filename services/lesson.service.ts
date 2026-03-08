@@ -69,6 +69,26 @@ class LessonService {
       throw error
     }
   }
+
+  async addVideoToLesson(lessonId: number, videoData: { video_url: string; title: string }): Promise<any> {
+    try {
+      const response = await apiClient.post(`/lessons/${lessonId}/videos`, videoData)
+      return response.data
+    } catch (error) {
+      console.error('Failed to add video to lesson:', error)
+      throw error
+    }
+  }
+
+  async addQuizToLesson(lessonId: number, quizData: { questions: any[] }): Promise<any> {
+    try {
+      const response = await apiClient.post(`/lessons/${lessonId}/quizzes`, quizData)
+      return response.data
+    } catch (error) {
+      console.error('Failed to add quiz to lesson:', error)
+      throw error
+    }
+  }
 }
 
 export const lessonService = new LessonService()

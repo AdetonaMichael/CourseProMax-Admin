@@ -5,12 +5,19 @@ import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import { useAuth } from '@/hooks/useAuth'
 import { Button } from '@/components/shared/Button'
+import {
+  LayoutDashboard,
+  BookOpen,
+  User,
+  HelpCircle,
+  LogOut,
+} from 'lucide-react'
 
 const INSTRUCTOR_MENU_ITEMS = [
-  { label: 'Dashboard', href: '/instructor', icon: '📊' },
-  { label: 'My Courses', href: '/instructor/courses', icon: '📚' },
-  { label: 'Profile', href: '/instructor/profile', icon: '👤' },
-  { label: 'Help', href: '/instructor/help', icon: '❓' },
+  { label: 'Dashboard', href: '/instructor', icon: LayoutDashboard },
+  { label: 'My Courses', href: '/instructor/courses', icon: BookOpen },
+  { label: 'Profile', href: '/instructor/profile', icon: User },
+  { label: 'Help', href: '/instructor/help', icon: HelpCircle },
 ]
 
 export function InstructorSidebar() {
@@ -37,6 +44,7 @@ export function InstructorSidebar() {
       <nav className="flex-1 space-y-2 px-4 py-6 overflow-y-auto">
         {INSTRUCTOR_MENU_ITEMS.map((item) => {
           const isActive = pathname === item.href || pathname.startsWith(item.href + '/')
+          const Icon = item.icon
           return (
             <Link
               key={item.href}
@@ -47,7 +55,7 @@ export function InstructorSidebar() {
                   : 'text-gray-300 hover:bg-gray-800'
               }`}
             >
-              <span className="text-lg">{item.icon}</span>
+              <Icon className="w-5 h-5" />
               <span>{item.label}</span>
             </Link>
           )
@@ -61,6 +69,7 @@ export function InstructorSidebar() {
           size="md"
           className="w-full"
         >
+          <LogOut className="w-4 h-4 mr-2" />
           Logout
         </Button>
       </div>

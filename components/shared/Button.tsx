@@ -2,6 +2,7 @@
 
 import { ButtonHTMLAttributes, ReactNode } from 'react'
 import { cva, type VariantProps } from 'class-variance-authority'
+import { Loader2 } from 'lucide-react'
 import { cn } from '@/utils/format.utils'
 
 const buttonVariants = cva(
@@ -56,8 +57,8 @@ export function Button({
     >
       {isLoading ? (
         <>
-          <span className="animate-spin mr-2">⟳</span>
-          Loading...
+          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+          {children}
         </>
       ) : (
         children

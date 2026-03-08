@@ -6,6 +6,7 @@ import { useSession, signIn, signOut } from 'next-auth/react'
 import { RegisterRequest } from '@/types'
 import { authService } from '@/services/auth.service'
 import { setStoredToken } from '@/utils/storage.utils'
+import { cleanJSONResponse } from '@/lib/error-handler'
 
 function redirectByRole(role: string, router: any) {
   switch (role) {
@@ -28,12 +29,17 @@ export function useAuth() {
   const isLoading = status === 'loading'
   const isAuthenticated = status === 'authenticated'
   const [loginError, setLoginError] = useState<string | null>(null)
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
+  const [statusCode, setStatusCode] = useState<number | null>(null)
 
   const login = useCallback(
     async (email: string, password: string, channel: string = 'web') => {
       setLoginError(null)
+      setFieldErrors({})
+      setStatusCode(null)
       try {
         console.log('[useAuth] Attempting login for:', email)
+        console.log('[useAuth] signIn params:', { email, channel, redirect: false })
         
         const result = await signIn('credentials', {
           email,
@@ -43,17 +49,20 @@ export function useAuth() {
         })
 
         console.log('[useAuth] signIn result:', { ok: result?.ok, error: result?.error, status: result?.status })
+        console.log('[useAuth] Full signIn result object:', JSON.stringify(result, null, 2))
 
         if (!result?.ok || result?.error) {
-          // NextAuth error messages are in result.error - format them nicely
+          // Handle login error with fallback for NextAuth errors
           let errorMsg = result?.error || 'Login failed'
           
-          // Map common NextAuth errors to user-friendly messages
+          // Convert NextAuth error codes to user-friendly messages
           if (errorMsg === 'CredentialsSignin') {
             errorMsg = 'Invalid email or password'
           }
           
           setLoginError(errorMsg)
+          setFieldErrors({})
+          setStatusCode(result?.status || 401)
           throw new Error(errorMsg)
         }
 
@@ -67,11 +76,18 @@ export function useAuth() {
         let freshSessionData: any = null
         try {
           const sessionResponse = await fetch('/api/auth/session')
-          freshSessionData = await sessionResponse.json()
+          const sessionText = await sessionResponse.text()
+          console.log('[useAuth] Session API raw response:', sessionText.substring(0, 300))
           
-          console.log('[useAuth] Fresh session data retrieved')
-          console.log('[useAuth] Token in fresh session:', !!freshSessionData?.accessToken)
-          
+          try {
+            const cleanedText = cleanJSONResponse(sessionText)
+            freshSessionData = JSON.parse(cleanedText)
+          } catch (parseErr) {
+            console.error('[useAuth] Failed to parse session response:', parseErr)
+            console.error('[useAuth] Response was:', sessionText.substring(0, 200))
+            throw new Error('Failed to parse session data')
+          }
+
           if (freshSessionData?.accessToken) {
             console.log('[useAuth] 💾 Saving token to localStorage...')
             setStoredToken(freshSessionData.accessToken)
@@ -103,7 +119,12 @@ export function useAuth() {
         }, 200)
       } catch (error: any) {
         const errorMsg = error.message || 'Login failed. Please try again.'
-        console.error('[useAuth] Login error:', errorMsg)
+        
+        // Log more details
+        if (error.stack) {
+          console.error('[useAuth] Error stack:', error.stack)
+        }
+        
         setLoginError(errorMsg)
         throw new Error(errorMsg)
       }
@@ -144,6 +165,8 @@ export function useAuth() {
     isAuthenticated,
     isLoading,
     error: loginError,
+    fieldErrors,
+    statusCode,
     login,
     register,
     logout,

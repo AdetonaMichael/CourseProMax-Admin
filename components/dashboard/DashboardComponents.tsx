@@ -1,11 +1,12 @@
 'use client';
 
 import React from 'react';
+import { Loader, Package } from 'lucide-react';
 
 interface StatCardProps {
   title: string;
   value: string | number;
-  icon: string;
+  icon?: string | React.ReactNode;
   trend?: {
     value: number;
     isPositive: boolean;
@@ -14,6 +15,8 @@ interface StatCardProps {
 }
 
 export function StatCard({ title, value, icon, trend, description }: StatCardProps) {
+  const isLucideIcon = React.isValidElement(icon);
+  
   return (
     <div className="bg-white rounded-lg p-6 border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
       <div className="flex items-end justify-between">
@@ -22,7 +25,13 @@ export function StatCard({ title, value, icon, trend, description }: StatCardPro
           <p className="text-3xl font-bold text-gray-900">{value}</p>
           {description && <p className="text-xs text-gray-500 mt-2">{description}</p>}
         </div>
-        <div className="text-3xl ml-4">{icon}</div>
+        <div className="ml-4 flex-shrink-0">
+          {isLucideIcon ? (
+            <div className="text-gray-600">{icon}</div>
+          ) : (
+            <div className="text-3xl">{icon}</div>
+          )}
+        </div>
       </div>
       {trend && (
         <div className="mt-4 flex items-center space-x-1">
@@ -66,8 +75,10 @@ export function DataTable({
   if (loading) {
     return (
       <div className="bg-white rounded-lg p-12 text-center">
-        <div className="inline-block animate-spin">⚙️</div>
-        <p className="text-gray-600 mt-4">Loading...</p>
+        <div className="flex justify-center mb-4">
+          <Loader className="w-8 h-8 text-gray-400 animate-spin" />
+        </div>
+        <p className="text-gray-600">Loading...</p>
       </div>
     );
   }
@@ -180,7 +191,7 @@ export function LoadingSkeleton({ count = 3 }: LoadingSkeletonProps) {
 }
 
 interface EmptyStateProps {
-  icon?: string;
+  icon?: React.ReactNode;
   title: string;
   description?: string;
   action?: {
@@ -189,10 +200,12 @@ interface EmptyStateProps {
   };
 }
 
-export function EmptyState({ icon = '📭', title, description, action }: EmptyStateProps) {
+export function EmptyState({ icon = <Package className="w-12 h-12 text-gray-400" />, title, description, action }: EmptyStateProps) {
   return (
     <div className="bg-white rounded-lg p-12 text-center">
-      <div className="text-5xl mb-4">{icon}</div>
+      <div className="flex justify-center mb-4">
+        {icon}
+      </div>
       <h3 className="text-lg font-semibold text-gray-900 mb-2">{title}</h3>
       {description && <p className="text-gray-600 mb-6">{description}</p>}
       {action && (

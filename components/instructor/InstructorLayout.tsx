@@ -4,6 +4,14 @@ import React, { ReactNode } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { signOut, useSession } from 'next-auth/react';
+import {
+  LayoutDashboard,
+  BookOpen,
+  Users,
+  DollarSign,
+  User,
+  Settings,
+} from 'lucide-react';
 
 interface InstructorLayoutProps {
   children: ReactNode;
@@ -14,12 +22,12 @@ export function InstructorLayout({ children }: InstructorLayoutProps) {
   const pathname = usePathname();
 
   const menuItems = [
-    { href: '/instructor', label: 'Dashboard', icon: '📊' },
-    { href: '/instructor/courses', label: 'My Courses', icon: '📚' },
-    { href: '/instructor/enrollments', label: 'Enrollments', icon: '👥' },
-    { href: '/instructor/earnings', label: 'Earnings', icon: '💰' },
-    { href: '/instructor/profile', label: 'Profile', icon: '👤' },
-    { href: '/instructor/settings', label: 'Settings', icon: '⚙️' },
+    { href: '/instructor', label: 'Dashboard', icon: LayoutDashboard },
+    { href: '/instructor/courses', label: 'My Courses', icon: BookOpen },
+    { href: '/instructor/enrollments', label: 'Enrollments', icon: Users },
+    { href: '/instructor/earnings', label: 'Earnings', icon: DollarSign },
+    { href: '/instructor/profile', label: 'Profile', icon: User },
+    { href: '/instructor/settings', label: 'Settings', icon: Settings },
   ];
 
   const isActive = (href: string) => {
@@ -39,20 +47,23 @@ export function InstructorLayout({ children }: InstructorLayoutProps) {
 
         {/* Navigation */}
         <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
-          {menuItems.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={`flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${
-                isActive(item.href)
-                  ? 'bg-white text-gray-900 font-semibold'
-                  : 'text-gray-400 hover:text-white hover:bg-gray-800'
-              }`}
-            >
-              <span className="text-lg">{item.icon}</span>
-              <span className="text-sm">{item.label}</span>
-            </Link>
-          ))}
+          {menuItems.map((item) => {
+            const Icon = item.icon
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${
+                  isActive(item.href)
+                    ? 'bg-white text-gray-900 font-semibold'
+                    : 'text-gray-400 hover:text-white hover:bg-gray-800'
+                }`}
+              >
+                <Icon className="w-5 h-5" />
+                <span className="text-sm">{item.label}</span>
+              </Link>
+            )
+          })}
         </nav>
 
         {/* User section */}

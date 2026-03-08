@@ -313,13 +313,9 @@ export default function CourseForm({ course, loading = false, onSubmit, onError 
         <Button
           type="submit"
           variant="primary"
-          disabled={submitting || loading}
+          isLoading={submitting}
         >
-          {submitting
-            ? 'Saving...'
-            : isEditMode
-              ? 'Update Course'
-              : 'Create Course'}
+          {isEditMode ? 'Update Course' : 'Create Course'}
         </Button>
         <p className="form-hint">
           * Required fields

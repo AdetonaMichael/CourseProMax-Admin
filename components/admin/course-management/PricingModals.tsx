@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { X, AlertCircle } from 'lucide-react'
+import { Button } from '@/components/shared/Button'
 import { courseService } from '@/services/course.service'
 import './PricingModals.css'
 
@@ -96,12 +97,12 @@ export function UpdatePriceModal({
         </div>
 
         <div className="modal-footer">
-          <button onClick={onClose} disabled={loading} className="btn-secondary">
+          <Button variant="secondary" onClick={onClose} disabled={loading}>
             Cancel
-          </button>
-          <button onClick={handleSubmit} disabled={loading} className="btn-primary" style={{ backgroundColor: '#000000', color: '#ffffff' }}>
-            {loading ? 'Updating...' : 'Update Price'}
-          </button>
+          </Button>
+          <Button variant="primary" onClick={handleSubmit} isLoading={loading}>
+            Update Price
+          </Button>
         </div>
       </div>
     </div>
@@ -155,12 +156,12 @@ export function MakeFreeModal({ courseId, onClose, onSuccess }: MakeFreModalProp
         </div>
 
         <div className="modal-footer">
-          <button onClick={onClose} disabled={loading} className="btn-secondary">
+          <Button variant="secondary" onClick={onClose} disabled={loading}>
             Cancel
-          </button>
-          <button onClick={handleConfirm} disabled={loading} className="btn-danger">
-            {loading ? 'Processing...' : 'Make Free'}
-          </button>
+          </Button>
+          <Button variant="danger" onClick={handleConfirm} isLoading={loading}>
+            Make Free
+          </Button>
         </div>
       </div>
     </div>
@@ -223,12 +224,12 @@ export function DeleteCourseModal({
         </div>
 
         <div className="modal-footer">
-          <button onClick={onClose} disabled={loading} className="btn-secondary">
+          <Button variant="secondary" onClick={onClose} disabled={loading}>
             Cancel
-          </button>
-          <button onClick={handleConfirm} disabled={loading} className="btn-danger-strong">
-            {loading ? 'Deleting...' : 'Delete Course'}
-          </button>
+          </Button>
+          <Button variant="danger" onClick={handleConfirm} isLoading={loading}>
+            Delete Course
+          </Button>
         </div>
       </div>
     </div>
