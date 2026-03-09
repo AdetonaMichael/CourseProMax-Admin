@@ -1,7 +1,17 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { getUserFullProfile, handleAPIError } from '@/services/admin.service'
+import { Plus, Trash2, RefreshCw } from 'lucide-react'
+import {
+  getUserFullProfile,
+  fetchRoles,
+  assignRoleToUser,
+  revokeRoleFromUser,
+  handleAPIError,
+  type Role,
+} from '@/services/admin.service'
+import { useNotification } from '@/hooks/useNotification'
+import { useConfirmation } from '@/components/shared/ConfirmationDialog'
 import './UserDetailsModal.css'
 
 interface UserDetailsModalProps {
@@ -11,13 +21,20 @@ interface UserDetailsModalProps {
 }
 
 export default function UserDetailsModal({ user, onClose, onUserUpdated }: UserDetailsModalProps) {
+  const notification = useNotification()
+  const { confirm } = useConfirmation()
   const [activeTab, setActiveTab] = useState('profile')
   const [userDetails, setUserDetails] = useState<any>(null)
+  const [roles, setRoles] = useState<Role[]>([])
   const [loading, setLoading] = useState(true)
+  const [rolesLoading, setRolesLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [selectedRole, setSelectedRole] = useState('')
+  const [assigningRole, setAssigningRole] = useState(false)
 
   useEffect(() => {
     loadUserDetails()
+    loadRoles()
   }, [user.id])
 
   async function loadUserDetails() {
@@ -31,6 +48,61 @@ export default function UserDetailsModal({ user, onClose, onUserUpdated }: UserD
       setError(apiError.message || 'Failed to load user details')
     } finally {
       setLoading(false)
+    }
+  }
+
+  async function loadRoles() {
+    try {
+      setRolesLoading(true)
+      const data = await fetchRoles()
+      setRoles(data)
+    } catch (err: any) {
+      console.error('Failed to load roles:', err)
+    } finally {
+      setRolesLoading(false)
+    }
+  }
+
+  const handleAssignRole = async () => {
+    if (!selectedRole) {
+      notification.error('Please select a role')
+      return
+    }
+
+    try {
+      setAssigningRole(true)
+      await assignRoleToUser(user.id, [selectedRole])
+      await loadUserDetails()
+      onUserUpdated()
+      setSelectedRole('')
+      notification.success('Role assigned successfully')
+    } catch (err: any) {
+      notification.error('Error assigning role: ' + (err.message || 'Unknown error'))
+    } finally {
+      setAssigningRole(false)
+    }
+  }
+
+  const handleRevokeRole = async (roleName: string) => {
+    const confirmed = await confirm({
+      title: 'Revoke Role',
+      description: `Are you sure you want to revoke the ${roleName} role?`,
+      confirmText: 'Revoke',
+      cancelText: 'Cancel',
+      isDangerous: true,
+    })
+
+    if (!confirmed) {
+      return
+    }
+
+    try {
+      await revokeRoleFromUser(user.id, [roleName])
+      await loadUserDetails()
+      onUserUpdated()
+      notification.success('Role revoked successfully')
+    } catch (err: any) {
+      notification.error('Error revoking role: ' + (err.message || 'Unknown error'))
     }
   }
 
@@ -122,9 +194,17 @@ export default function UserDetailsModal({ user, onClose, onUserUpdated }: UserD
                   <div className="role-badges">
                     {userDetails.roles && userDetails.roles.length > 0 ? (
                       userDetails.roles.map((role: string) => (
-                        <span key={role} className="role-badge">
-                          {role}
-                        </span>
+                        <div key={role} className="role-badge-with-action">
+                          <span className="role-badge">{role}</span>
+                          <button
+                            className="btn-revoke-role"
+                            onClick={() => handleRevokeRole(role)}
+                            title="Revoke role"
+                            disabled={assigningRole}
+                          >
+                            <Trash2 size={14} />
+                          </button>
+                        </div>
                       ))
                     ) : (
                       <span>-</span>
@@ -154,6 +234,41 @@ export default function UserDetailsModal({ user, onClose, onUserUpdated }: UserD
                   {userDetails.block_reason && <p>Reason: {userDetails.block_reason}</p>}
                 </div>
               )}
+
+              {/* Role Assignment Section */}
+              <div className="role-assignment-section">
+                <h4>Assign New Role</h4>
+                <div className="assign-role-controls">
+                  <select
+                    value={selectedRole}
+                    onChange={(e) => setSelectedRole(e.target.value)}
+                    disabled={rolesLoading || assigningRole}
+                    className="role-select"
+                  >
+                    <option value="">Select a role...</option>
+                    {roles.map((role: Role) => {
+                      // Filter out roles the user already has
+                      const userRoles = userDetails.roles || []
+                      if (userRoles.includes(role.name)) {
+                        return null
+                      }
+                      return (
+                        <option key={role.id} value={role.name}>
+                          {role.name}
+                        </option>
+                      )
+                    })}
+                  </select>
+                  <button
+                    className="btn btn-primary"
+                    onClick={handleAssignRole}
+                    disabled={!selectedRole || assigningRole || rolesLoading}
+                  >
+                    <Plus size={16} />
+                    {assigningRole ? 'Assigning...' : 'Add Role'}
+                  </button>
+                </div>
+              </div>
             </div>
           )}
 

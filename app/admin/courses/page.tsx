@@ -26,7 +26,17 @@ export default function CoursesPage() {
 
   useEffect(() => {
     loadCourses()
-  }, [page, search, level, category])
+  }, [page, level, category])
+
+  // Separate effect for search with debouncing
+  useEffect(() => {
+    const debounceTimer = setTimeout(() => {
+      // Only fetch when search actually changes after user stops typing
+      loadCourses()
+    }, 500)
+
+    return () => clearTimeout(debounceTimer)
+  }, [search])
 
   const loadCourses = async () => {
     try {

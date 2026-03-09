@@ -1,337 +1,465 @@
 'use client'
 
 import Link from 'next/link'
-import Image from 'next/image'
-import { Button } from '@/components/shared/Button'
-import { LandingNav } from '@/components/landing/LandingNav'
-import { ArrowRight, Zap, Shield, Users, BarChart3, Globe, Lightbulb } from 'lucide-react'
+import { ArrowRight, TrendingUp, BookOpen, Users, Award, Brain, Play, BarChart2, Star, Layers } from 'lucide-react'
+import { useEffect, useRef, useState } from 'react'
 
-export default function Home() {
+// ─── Hooks ────────────────────────────────────────────────────────────────────
+function useCounter(target: number, duration = 2000, started = false) {
+  const [count, setCount] = useState(0)
+  useEffect(() => {
+    if (!started) return
+    let start = 0
+    const step = target / (duration / 16)
+    const timer = setInterval(() => {
+      start += step
+      if (start >= target) { setCount(target); clearInterval(timer) }
+      else setCount(Math.floor(start))
+    }, 16)
+    return () => clearInterval(timer)
+  }, [target, duration, started])
+  return count
+}
+
+function useInView(threshold = 0.1) {
+  const ref = useRef<HTMLDivElement>(null)
+  const [inView, setInView] = useState(false)
+  useEffect(() => {
+    const obs = new IntersectionObserver(([e]) => { if (e.isIntersecting) setInView(true) }, { threshold })
+    if (ref.current) obs.observe(ref.current)
+    return () => obs.disconnect()
+  }, [threshold])
+  return { ref, inView }
+}
+
+// ─── Components ───────────────────────────────────────────────────────────────
+function StatCard({ value, suffix, label, delay }: { value: number; suffix: string; label: string; delay: number }) {
+  const { ref, inView } = useInView()
+  const count = useCounter(value, 2000, inView)
   return (
-    <div className="min-h-screen bg-white overflow-hidden">
-      {/* Navigation */}
-      <LandingNav />
-
-      {/* ===== HERO SECTION WITH BACKGROUND IMAGE ===== */}
-      <section className="relative h-[90vh] flex items-center justify-center overflow-hidden">
-        {/* Hero Background Image with Overlay */}
-        <div className="absolute inset-0 z-0">
-          <img
-            src="https://images.pexels.com/photos/1181690/pexels-photo-1181690.jpeg?auto=compress&cs=tinysrgb&w=1600"
-            alt="Hero background"
-            className="w-full h-full object-cover"
-          />
-          {/* Dark Overlay */}
-          <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/60 to-black/50" />
-        </div>
-
-        {/* Hero Content */}
-        <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className="animate-fade-in-up">
-            {/* Tagline */}
-            <div className="inline-block mb-6 px-4 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/15 transition">
-              <span className="text-white text-sm font-semibold">✨ Next Generation Course Platform</span>
-            </div>
-
-            {/* Main Headline */}
-            <h1 className="text-5xl md:text-7xl lg:text-8xl font-black text-white mb-6 leading-tight tracking-tight">
-              Elevate Your
-              <span className="block bg-gradient-to-r from-cyan-400 via-blue-400 to-white bg-clip-text text-transparent">
-                Learning Platform
-              </span>
-            </h1>
-
-            {/* Subheading */}
-            <p className="text-xl md:text-2xl text-gray-200 mb-12 leading-relaxed max-w-3xl mx-auto font-light">
-              Enterprise-grade course management with the elegance of luxury. Manage instructors, courses, and students with unprecedented simplicity and power.
-            </p>
-
-            {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link href="/admin" className="group">
-                <Button size="lg" variant="primary" className="w-full sm:w-auto px-8 flex items-center gap-2 bg-white text-black hover:bg-gray-100">
-                  Explore Admin
-                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                </Button>
-              </Link>
-              <Link href="/instructor">
-                <Button size="lg" variant="secondary" className="w-full sm:w-auto px-8 bg-white/20 text-white border border-white/30 hover:bg-white/30 transition">
-                  Instructor Portal
-                </Button>
-              </Link>
-            </div>
-          </div>
-        </div>
-
-        {/* Scroll Indicator */}
-        <div className="absolute bottom-8 z-10 animate-bounce">
-          <svg className="w-6 h-6 text-white mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-          </svg>
-        </div>
-      </section>
-
-      {/* ===== STATS SECTION ===== */}
-      <section className="py-16 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-gray-50 to-white">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <StatCard number="50K+" label="Active Learners" delay="delay-100" />
-            <StatCard number="2K+" label="Courses Live" delay="delay-200" />
-            <StatCard number="99.99%" label="Uptime SLA" delay="delay-300" />
-          </div>
-        </div>
-      </section>
-
-      {/* ===== HORIZONTALLY SCROLLABLE FEATURES CARDS ===== */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-white">
-        <div className="max-w-7xl mx-auto">
-          <div className="mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-              Everything You Need
-            </h2>
-            <p className="text-xl text-gray-600 max-w-2xl">
-              Comprehensive tools designed to scale your educational vision
-            </p>
-          </div>
-
-          {/* Scrollable Container */}
-          <div className="overflow-x-auto pb-4 scroll-smooth">
-            <div className="flex gap-6 min-w-max">
-              <FeatureCard
-                icon={Zap}
-                title="Lightning Performance"
-                description="Turbopack-powered platform with sub-second load times. Built for speed."
-                bgColor="from-blue-500 to-cyan-500"
-              />
-              <FeatureCard
-                icon={Shield}
-                title="Enterprise Security"
-                description="JWT authentication, role-based access, and enterprise-grade encryption."
-                bgColor="from-purple-500 to-pink-500"
-              />
-              <FeatureCard
-                icon={BarChart3}
-                title="Real-time Analytics"
-                description="Comprehensive dashboards with student progress, revenue, and engagement metrics."
-                bgColor="from-orange-500 to-red-500"
-              />
-              <FeatureCard
-                icon={Users}
-                title="User Management"
-                description="Manage instructors, admins, and students with granular permissions and roles."
-                bgColor="from-green-500 to-emerald-500"
-              />
-              <FeatureCard
-                icon={Globe}
-                title="Global Scale"
-                description="Cloud-native architecture that scales infinitely without compromising performance."
-                bgColor="from-indigo-500 to-blue-500"
-              />
-              <FeatureCard
-                icon={Lightbulb}
-                title="Smart Automation"
-                description="Automated workflows, certificate generation, and intelligent enrollment management."
-                bgColor="from-yellow-500 to-orange-500"
-              />
-            </div>
-          </div>
-
-          {/* Scroll Hint */}
-          <p className="text-center text-gray-500 text-sm mt-8">← Scroll for more features →</p>
-        </div>
-      </section>
-
-      {/* ===== HIGHLIGHTS SECTION ===== */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-gray-50 to-white">
-        <div className="max-w-7xl mx-auto">
-          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 text-center mb-16">
-            Designed for Excellence
-          </h2>
-
-          <div className="grid md:grid-cols-2 gap-12">
-            <HighlightBlock
-              title="Intuitive Admin Dashboard"
-              description="Manage everything from a single elegant interface. Course creation, enrollment tracking, revenue analytics—all at your fingertips."
-              points={["Real-time course analytics", "Student enrollment tracking", "Revenue dashboard", "User management tools"]}
-            />
-            <HighlightBlock
-              title="Instructor Empowerment"
-              description="Give instructors the tools to thrive. Built-in course editor, student communication, and performance insights."
-              points={["Course creation & editing", "Student communication", "Progress tracking", "Certificate management"]}
-            />
-            <HighlightBlock
-              title="Security & Compliance"
-              description="Enterprise-grade security meets regulatory compliance. Your data is protected with industry-leading encryption and practices."
-              points={["JWT authentication", "Role-based access control", "Data encryption", "Audit logging"]}
-            />
-            <HighlightBlock
-              title="Scalable Infrastructure"
-              description="From 10 students to 10 million. Our cloud-native platform grows with you effortlessly, maintaining performance always."
-              points={["Auto-scaling", "99.99% uptime", "CDN integration", "Global reach"]}
-            />
-          </div>
-        </div>
-      </section>
-
-      {/* ===== LUXURY CTA SECTION ===== */}
-      <section className="relative py-24 px-4 sm:px-6 lg:px-8 overflow-hidden">
-        {/* Background Elements */}
-        <div className="absolute inset-0 z-0">
-          <img
-            src="https://images.pexels.com/photos/3808517/pexels-photo-3808517.jpeg?auto=compress&cs=tinysrgb&w=1600"
-            alt="CTA background"
-            className="w-full h-full object-cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-black/80 to-black/60" />
-        </div>
-
-        {/* Content */}
-        <div className="relative z-10 max-w-3xl mx-auto text-center">
-          <h2 className="text-4xl md:text-5xl font-black text-white mb-6 leading-tight">
-            Transform Your Educational Vision
-          </h2>
-          <p className="text-xl text-gray-200 mb-10 font-light">
-            Join forward-thinking educators and administrators who've already revolutionized their platforms with CourseProMax.
-          </p>
-          <Link href="/register">
-            <Button size="lg" variant="primary" className="px-10 flex items-center gap-2 mx-auto bg-white text-black hover:bg-gray-100">
-              Start Your Journey
-              <ArrowRight className="w-4 h-4" />
-            </Button>
-          </Link>
-        </div>
-      </section>
-
-      {/* ===== FOOTER ===== */}
-      <footer className="bg-black text-gray-400 py-16 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid md:grid-cols-4 gap-12 mb-12">
-            <div>
-              <h4 className="text-white font-bold mb-4 text-lg">CourseProMax</h4>
-              <p className="text-sm leading-relaxed">The epitome of course management excellence. Enterprise power. Luxury design.</p>
-            </div>
-            <div>
-              <h4 className="text-white font-semibold mb-4">Product</h4>
-              <ul className="space-y-2 text-sm">
-                <li><Link href="#" className="hover:text-white transition">Features</Link></li>
-                <li><Link href="#" className="hover:text-white transition">Security</Link></li>
-                <li><Link href="#" className="hover:text-white transition">Pricing</Link></li>
-                <li><Link href="#" className="hover:text-white transition">API</Link></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="text-white font-semibold mb-4">Company</h4>
-              <ul className="space-y-2 text-sm">
-                <li><Link href="#" className="hover:text-white transition">About</Link></li>
-                <li><Link href="#" className="hover:text-white transition">Blog</Link></li>
-                <li><Link href="#" className="hover:text-white transition">Careers</Link></li>
-                <li><Link href="#" className="hover:text-white transition">Contact</Link></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="text-white font-semibold mb-4">Legal</h4>
-              <ul className="space-y-2 text-sm">
-                <li><Link href="#" className="hover:text-white transition">Privacy Policy</Link></li>
-                <li><Link href="#" className="hover:text-white transition">Terms of Service</Link></li>
-                <li><Link href="#" className="hover:text-white transition">Cookie Policy</Link></li>
-              </ul>
-            </div>
-          </div>
-          <div className="border-t border-gray-800 pt-8 text-center text-sm">
-            <p>&copy; 2026 CourseProMax. Crafted with excellence.</p>
-          </div>
-        </div>
-      </footer>
-
-      {/* CSS Animations */}
-      <style jsx>{`
-        @keyframes fade-in-up {
-          from {
-            opacity: 0;
-            transform: translateY(30px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-
-        .animate-fade-in-up {
-          animation: fade-in-up 0.8s ease-out;
-        }
-
-        .delay-100 {
-          animation-delay: 100ms;
-        }
-
-        .delay-200 {
-          animation-delay: 200ms;
-        }
-
-        .delay-300 {
-          animation-delay: 300ms;
-        }
-      `}</style>
+    <div ref={ref} className="text-center px-6 border-r border-gray-200 last:border-r-0" style={{ animationDelay: `${delay}ms` }}>
+      <div style={{ fontFamily: "'Syne', sans-serif" }} className="text-5xl font-black text-black tracking-tight leading-none">
+        {count.toLocaleString()}{suffix}
+      </div>
+      <p className="text-sm text-gray-500 mt-2">{label}</p>
     </div>
   )
 }
 
-function StatCard({ number, label, delay }: { number: string; label: string; delay: string }) {
+function FeatureCard({ icon: Icon, title, desc, index }: { icon: any; title: string; desc: string; index: number }) {
+  const { ref, inView } = useInView()
   return (
-    <div className={`text-center animate-fade-in-up ${delay}`}>
-      <div className="text-4xl md:text-5xl font-black text-black mb-3">{number}</div>
-      <p className="text-gray-600 text-lg">{label}</p>
-    </div>
-  )
-}
-
-function FeatureCard({
-  icon: Icon,
-  title,
-  description,
-  bgColor,
-}: {
-  icon: any
-  title: string
-  description: string
-  bgColor: string
-}) {
-  return (
-    <div className="min-w-[350px] group">
-      <div className={`bg-gradient-to-br ${bgColor} rounded-2xl p-8 h-full text-white shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-2`}>
-        <div className="mb-6 p-4 bg-white/20 rounded-xl w-fit group-hover:bg-white/30 transition">
-          <Icon className="w-8 h-8" />
-        </div>
-        <h3 className="text-2xl font-bold mb-3">{title}</h3>
-        <p className="text-white/90 leading-relaxed">{description}</p>
+    <div
+      ref={ref}
+      className={`bg-white p-8 relative group cursor-default transition-all duration-500 hover:bg-gray-50 ${inView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-3'}`}
+      style={{ transitionDelay: `${index * 100}ms` }}
+    >
+      <div className="w-9 h-9 rounded-lg bg-black flex items-center justify-center text-white mb-5 shrink-0">
+        <Icon size={16} />
+      </div>
+      <h3 className="text-base font-bold text-black mb-2 tracking-tight">{title}</h3>
+      <p className="text-sm text-gray-500 leading-relaxed font-light">{desc}</p>
+      <div className="absolute bottom-5 right-5 text-gray-200 group-hover:text-black group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all duration-200">
+        <ArrowRight size={14} />
       </div>
     </div>
   )
 }
 
-function HighlightBlock({
-  title,
-  description,
-  points,
-}: {
-  title: string
-  description: string
-  points: string[]
-}) {
+function DashboardPreview() {
+  const { ref, inView } = useInView(0.2)
+  const bars = [65, 80, 45, 90, 70, 85, 55, 75, 60, 88, 72, 95]
+  const months = ['J','F','M','A','M','J','J','A','S','O','N','D']
+
   return (
-    <div className="bg-white rounded-2xl p-8 border border-gray-200 hover:border-gray-300 hover:shadow-lg transition-all">
-      <h3 className="text-2xl font-bold text-gray-900 mb-3">{title}</h3>
-      <p className="text-gray-600 mb-6 leading-relaxed">{description}</p>
-      <ul className="space-y-3">
-        {points.map((point, idx) => (
-          <li key={idx} className="flex items-start gap-3">
-            <div className="w-5 h-5 rounded-full bg-black text-white flex items-center justify-center flex-shrink-0 mt-0.5 text-xs font-bold">
-              ✓
-            </div>
-            <span className="text-gray-700">{point}</span>
-          </li>
+    <div
+      ref={ref}
+      className={`bg-black rounded-2xl overflow-hidden border border-neutral-800 shadow-2xl transition-all duration-700 ${inView ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-5 scale-95'}`}
+    >
+      {/* Top bar */}
+      <div className="flex items-center gap-3 px-4 py-3 bg-neutral-900 border-b border-neutral-800">
+        <div className="flex gap-1.5">
+          <span className="w-2.5 h-2.5 rounded-full bg-neutral-700" />
+          <span className="w-2.5 h-2.5 rounded-full bg-neutral-700" />
+          <span className="w-2.5 h-2.5 rounded-full bg-neutral-700" />
+        </div>
+        <span className="flex-1 text-center text-xs text-neutral-600">CourseProMax — Instructor Dashboard</span>
+        <span className="text-xs text-green-400">● Live</span>
+      </div>
+
+      {/* Stats row */}
+      <div className="grid grid-cols-4 border-b border-neutral-800">
+        {[
+          { label: 'Revenue', value: '$24,580', change: '+12.4%' },
+          { label: 'Students', value: '1,284', change: '+8.1%' },
+          { label: 'Courses', value: '18', change: '+2' },
+          { label: 'Completion', value: '87%', change: '+3.2%' },
+        ].map((s, i) => (
+          <div key={i} className="p-3 border-r border-neutral-800 last:border-r-0">
+            <p className="text-xs text-neutral-600 mb-1 truncate">{s.label}</p>
+            <p className="text-base font-bold text-white tracking-tight">{s.value}</p>
+            <p className="text-xs text-green-400 mt-0.5">{s.change}</p>
+          </div>
         ))}
-      </ul>
+      </div>
+
+      {/* Chart */}
+      <div className="p-4">
+        <div className="flex justify-between items-center mb-3">
+          <span className="text-xs text-neutral-400 font-medium">Earnings Overview</span>
+          <span className="text-xs text-neutral-600">Last 12 months</span>
+        </div>
+        <div className="flex items-end gap-1 h-20">
+          {bars.map((h, i) => (
+            <div key={i} className="flex-1 flex items-end h-full">
+              <div
+                className="w-full bg-white opacity-80"
+                style={{
+                  height: inView ? `${h}%` : '0%',
+                  transition: `height 0.5s ease ${i * 80 + 600}ms`,
+                  borderRadius: '2px 2px 0 0'
+                }}
+              />
+            </div>
+          ))}
+        </div>
+        <div className="flex justify-between mt-1.5">
+          {months.map((m, i) => (
+            <span key={i} className="text-xs text-neutral-700 flex-1 text-center">{m}</span>
+          ))}
+        </div>
+      </div>
+
+      {/* AI strip */}
+      <div className="flex items-center gap-2 px-4 py-2.5 bg-neutral-950 border-t border-neutral-800">
+        <Brain size={13} className="text-neutral-500 shrink-0" />
+        <span className="text-xs text-neutral-500 leading-relaxed">
+          AI suggests: <strong className="text-white font-medium">Add a React Advanced module</strong> — 340 students nearby are looking for it
+        </span>
+      </div>
     </div>
+  )
+}
+
+// ─── Page ─────────────────────────────────────────────────────────────────────
+export default function Home() {
+  const [scrolled, setScrolled] = useState(false)
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 40)
+    window.addEventListener('scroll', onScroll)
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
+
+  const syne = { fontFamily: "'Syne', sans-serif" }
+
+  return (
+    <>
+      <style jsx global>{`
+        @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500&display=swap');
+
+        body { font-family: 'DM Sans', sans-serif; -webkit-font-smoothing: antialiased; }
+
+        @keyframes fadeSlideUp {
+          from { opacity: 0; transform: translateY(16px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes scrollLine {
+          0%   { transform: scaleY(0); transform-origin: top; }
+          50%  { transform: scaleY(1); transform-origin: top; }
+          51%  { transform: scaleY(1); transform-origin: bottom; }
+          100% { transform: scaleY(0); transform-origin: bottom; }
+        }
+        @keyframes pulseDot {
+          0%, 100% { opacity: 1; transform: scale(1); }
+          50%       { opacity: 0.4; transform: scale(0.8); }
+        }
+
+        .anim-up          { animation: fadeSlideUp 0.6s ease both; }
+        .anim-up-d1       { animation: fadeSlideUp 0.6s 0.1s ease both; }
+        .anim-up-d2       { animation: fadeSlideUp 0.6s 0.2s ease both; }
+        .anim-up-d3       { animation: fadeSlideUp 0.6s 0.3s ease both; }
+        .anim-up-d10      { animation: fadeSlideUp 0.6s 1s ease both; opacity: 0; }
+        .anim-scroll-line { animation: scrollLine 1.5s ease infinite; }
+        .anim-pulse-dot   { animation: pulseDot 2s ease infinite; }
+
+        .hero-grid {
+          background-image:
+            linear-gradient(#e8e8e8 1px, transparent 1px),
+            linear-gradient(90deg, #e8e8e8 1px, transparent 1px);
+          background-size: 60px 60px;
+          -webkit-mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, black 30%, transparent 100%);
+          mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, black 30%, transparent 100%);
+        }
+
+        /* Dividers between feature cards */
+        .feature-grid-cell + .feature-grid-cell { border-left: 1px solid #e8e8e8; }
+        @media (max-width: 768px) {
+          .feature-grid-cell + .feature-grid-cell { border-left: none; border-top: 1px solid #e8e8e8; }
+        }
+      `}</style>
+
+      <div className="min-h-screen bg-white text-black overflow-x-hidden">
+
+        {/* ── NAV ── */}
+        <nav className={`fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-8 md:px-12 h-16 transition-all duration-300 ${scrolled ? 'bg-white/90 backdrop-blur-md border-b border-gray-200' : ''}`}>
+          <Link
+            href="/"
+            style={syne}
+            className="font-black text-lg tracking-tight text-black no-underline whitespace-nowrap"
+          >
+            CourseProMax
+          </Link>
+          <ul className="hidden md:flex items-center gap-8 list-none">
+            {['Features', 'Dashboard', 'AI Engine', 'Pricing'].map(l => (
+              <li key={l}>
+                <a href={`#${l.toLowerCase().replace(' ', '-')}`} className="text-sm text-gray-500 hover:text-black transition-colors no-underline">
+                  {l}
+                </a>
+              </li>
+            ))}
+          </ul>
+          <div className="flex items-center gap-3">
+            <a href="/admin" className="hidden sm:block text-sm font-medium text-black border border-gray-200 px-4 py-2 rounded-md hover:bg-gray-100 hover:border-gray-300 transition-all no-underline">
+              Sign In
+            </a>
+            <a href="/register" className="text-sm font-medium text-white bg-black px-4 py-2 rounded-md hover:opacity-80 transition-opacity flex items-center gap-1.5 no-underline">
+              Get Started <ArrowRight size={13} />
+            </a>
+          </div>
+        </nav>
+
+        {/* ── HERO ── */}
+        <section className="relative min-h-screen flex flex-col items-center justify-center px-6 pt-28 pb-24 overflow-hidden bg-white">
+          <div className="hero-grid absolute inset-0 opacity-50 pointer-events-none" />
+
+          <div className="relative z-10 max-w-3xl mx-auto text-center">
+           
+
+            {/* Headline */}
+            <h1
+              className="anim-up-d1 font-black text-black leading-none tracking-tighter mb-6"
+              style={{ ...syne, fontSize: 'clamp(48px, 7vw, 88px)' }}
+            >
+              Teach Smarter.<br />
+              <span className="text-gray-300">Earn More.</span>
+            </h1>
+
+            {/* Subheading */}
+            <p className="anim-up-d2 text-lg text-gray-500 font-light leading-relaxed max-w-xl mx-auto mb-10">
+              The instructor dashboard that thinks with you — manage courses, track earnings, and let AI surface what your students need next.
+            </p>
+
+            {/* CTAs */}
+            <div className="anim-up-d3 flex flex-col sm:flex-row items-center justify-center gap-3 flex-wrap">
+              <a href="/admin" className="inline-flex items-center gap-2 text-sm font-medium text-white bg-black px-6 py-3 rounded-lg hover:opacity-80 active:scale-95 transition-all no-underline">
+                Open Dashboard <ArrowRight size={15} />
+              </a>
+              <a href="/demo" className="inline-flex items-center gap-2 text-sm text-gray-500 border border-gray-200 px-6 py-3 rounded-lg hover:border-gray-400 hover:text-black transition-all no-underline">
+                <Play size={13} /> Watch Demo
+              </a>
+            </div>
+          </div>
+
+          {/* Scroll indicator */}
+          <div className="anim-up-d10 absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2">
+            <span className="text-xs tracking-widest uppercase text-gray-400">scroll</span>
+            <div className="w-px h-8 bg-gray-300 anim-scroll-line" />
+          </div>
+        </section>
+
+        {/* ── STATS ── */}
+        <section className="py-20 px-6 bg-gray-50 border-t border-b border-gray-200">
+          <div className="max-w-5xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-y-10 gap-x-0">
+            <StatCard value={50000} suffix="+" label="Active Learners" delay={0} />
+            <StatCard value={2000}  suffix="+" label="Courses Published" delay={100} />
+            <StatCard value={99}    suffix="%" label="Uptime SLA" delay={200} />
+            <StatCard value={4800}  suffix="+" label="Instructors Earning" delay={300} />
+          </div>
+        </section>
+
+        {/* ── DASHBOARD PREVIEW ── */}
+        <section className="py-24 px-6 bg-white" id="dashboard">
+          <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-16 items-center">
+            <div className="flex flex-col">
+              <p className="text-xs font-semibold tracking-widest uppercase text-gray-400 mb-4">Instructor Dashboard</p>
+              <h2
+                className="font-black text-black leading-none tracking-tighter mb-5"
+                style={{ ...syne, fontSize: 'clamp(32px, 4vw, 52px)' }}
+              >
+                Everything in<br />one view.
+              </h2>
+              <p className="text-base text-gray-500 font-light leading-relaxed mb-8 max-w-sm">
+                Track your revenue, monitor student performance, and manage your entire course catalogue — all from a single focused interface.
+              </p>
+              <ul className="flex flex-col gap-3">
+                {[
+                  'Real-time earnings with monthly breakdowns',
+                  'Student completion and engagement rates',
+                  'Course performance benchmarking',
+                  'AI-generated content recommendations',
+                  'Certificate management and delivery',
+                ].map((pt, i) => (
+                  <li key={i} className="flex items-center gap-3 text-sm text-gray-500">
+                    <span className="w-1 h-1 rounded-full bg-black shrink-0" />
+                    {pt}
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <DashboardPreview />
+          </div>
+        </section>
+
+        {/* ── FEATURES ── */}
+        <section className="py-24 px-6 bg-gray-50 border-t border-gray-200" id="features">
+          <div className="max-w-6xl mx-auto">
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-14">
+              <div>
+                <p className="text-xs font-semibold tracking-widest uppercase text-gray-400 mb-3">Platform Features</p>
+                <h2
+                  className="font-black text-black leading-none tracking-tighter"
+                  style={{ ...syne, fontSize: 'clamp(32px, 4vw, 52px)' }}
+                >
+                  Built for instructors.
+                </h2>
+              </div>
+              <a href="/features" className="text-sm font-medium text-black border border-gray-200 px-4 py-2 rounded-md hover:bg-white hover:border-gray-300 transition-all no-underline w-fit whitespace-nowrap">
+                View all features
+              </a>
+            </div>
+
+            <div className="border border-gray-200 rounded-xl overflow-hidden">
+              <div className="grid grid-cols-1 md:grid-cols-3">
+                {[
+                  { icon: TrendingUp, title: 'Earnings Tracking',    desc: 'Detailed revenue analytics with payout history, trends, and forecasting across all your courses.' },
+                  { icon: Users,      title: 'Student Performance',  desc: 'Monitor progress, completion rates, quiz scores, and engagement patterns at scale.' },
+                  { icon: BookOpen,   title: 'Course Management',    desc: 'Upload lessons, organise categories, set pricing, and manage content versioning with ease.' },
+                  { icon: Award,      title: 'Certifications',       desc: 'Auto-generate branded certificates on course completion. Fully customisable templates.' },
+                  { icon: BarChart2,  title: 'Analytics Suite',      desc: 'Comprehensive reporting on course performance, student retention, and revenue attribution.' },
+                  { icon: Layers,     title: 'Assignment Builder',   desc: 'Create quizzes and assessments with automated grading and instant feedback tools.' },
+                ].map((f, i) => (
+                  <div key={i} className={`feature-grid-cell ${i >= 3 ? 'border-t border-gray-200' : ''}`}>
+                    <FeatureCard icon={f.icon} title={f.title} desc={f.desc} index={i} />
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ── AI SECTION ── */}
+        <section className="py-24 px-6 bg-black" id="ai-engine">
+          <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-16 items-start">
+
+            {/* Left — text */}
+            <div className="flex flex-col">
+              <p className="text-xs font-semibold tracking-widest uppercase text-neutral-600 mb-4">AI Engine</p>
+              <h2
+                className="font-black text-white leading-none tracking-tighter mb-5"
+                style={{ ...syne, fontSize: 'clamp(32px, 4vw, 52px)' }}
+              >
+                Recommendations<br />
+                <span className="text-neutral-600">that actually work.</span>
+              </h2>
+              <p className="text-base text-neutral-500 font-light leading-relaxed mb-10 max-w-sm">
+                Our engine analyses behaviour across the platform and surfaces content gaps your courses can fill — before your competitors do.
+              </p>
+              <a
+                href="/register"
+                className="inline-flex items-center gap-2 text-sm font-medium text-black bg-white px-6 py-3 rounded-lg hover:opacity-90 transition-opacity no-underline w-fit"
+              >
+                Try it free <ArrowRight size={15} />
+              </a>
+            </div>
+
+            {/* Right — cards */}
+            <div className="flex flex-col gap-3">
+              {[
+                { icon: Brain,      title: 'Demand Forecasting',   desc: 'AI predicts which topics will trend in your niche over the next 90 days.' },
+                { icon: Star,       title: 'Content Gap Analysis', desc: "Identify what your students search for but can't find in your catalogue." },
+                { icon: Users,      title: 'Personalised Paths',   desc: 'Each student gets a custom learning path built from their goals and history.' },
+                { icon: TrendingUp, title: 'Revenue Optimisation', desc: 'Smart pricing suggestions based on demand, competition, and your audience.' },
+              ].map((c, i) => (
+                <div key={i} className="flex items-start gap-4 bg-neutral-900 border border-neutral-800 rounded-xl p-5 hover:border-neutral-700 transition-colors">
+                  <div className="w-8 h-8 rounded-md bg-neutral-800 flex items-center justify-center text-neutral-400 shrink-0 mt-0.5">
+                    <c.icon size={15} />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-sm font-medium text-neutral-200 mb-1">{c.title}</p>
+                    <p className="text-sm text-neutral-500 leading-relaxed font-light">{c.desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ── CTA ── */}
+        <section className="py-32 px-6 bg-white border-t border-gray-200 text-center">
+          <h2
+            className="font-black text-black leading-none tracking-tighter mb-5"
+            style={{ ...syne, fontSize: 'clamp(40px, 7vw, 80px)' }}
+          >
+            Start teaching.<br />Start earning.
+          </h2>
+          <p className="text-lg text-gray-500 font-light mb-10 max-w-md mx-auto leading-relaxed">
+            Join thousands of instructors already growing their income on CourseProMax.
+          </p>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 flex-wrap mb-4">
+            <a href="/register" className="inline-flex items-center gap-2 text-sm font-medium text-white bg-black px-7 py-3.5 rounded-lg hover:opacity-80 transition-opacity no-underline">
+              Create Free Account <ArrowRight size={15} />
+            </a>
+            <a href="/admin" className="inline-flex items-center gap-2 text-sm text-gray-500 border border-gray-200 px-7 py-3.5 rounded-lg hover:border-gray-400 hover:text-black transition-all no-underline">
+              Explore Dashboard
+            </a>
+          </div>
+          <p className="text-xs text-gray-400">No credit card required · Free plan available</p>
+        </section>
+
+        {/* ── FOOTER ── */}
+        <footer className="bg-black text-neutral-600 px-8 md:px-12 pt-16 pb-8 border-t border-neutral-900">
+          <div className="max-w-6xl mx-auto">
+            <div className="flex flex-col md:flex-row justify-between gap-12 pb-12 border-b border-neutral-900 mb-8">
+              <div className="max-w-xs shrink-0">
+                <span style={syne} className="font-black text-white text-lg block mb-3 tracking-tight">
+                  CourseProMax
+                </span>
+                <p className="text-sm leading-relaxed">
+                  AI-powered course management for the modern instructor. Teach smarter, earn more.
+                </p>
+              </div>
+              <div className="flex gap-12 md:gap-16 flex-wrap">
+                {[
+                  { heading: 'Product',     links: ['Features', 'Pricing', 'Security', 'API'] },
+                  { heading: 'Instructors', links: ['Getting Started', 'Dashboard', 'Certifications', 'Payouts'] },
+                  { heading: 'Company',     links: ['About', 'Blog', 'Careers', 'Contact'] },
+                ].map(col => (
+                  <div key={col.heading}>
+                    <h5 className="text-xs font-semibold tracking-widest uppercase text-neutral-400 mb-4">{col.heading}</h5>
+                    <ul className="flex flex-col gap-2.5 list-none">
+                      {col.links.map(l => (
+                        <li key={l}>
+                          <a href="#" className="text-sm text-neutral-600 hover:text-white transition-colors no-underline">{l}</a>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="flex flex-col sm:flex-row justify-between items-center gap-3">
+              <p className="text-xs">&copy; 2026 CourseProMax. All rights reserved.</p>
+              <div className="flex gap-6">
+                {['Privacy', 'Terms', 'Cookies'].map(l => (
+                  <a key={l} href="#" className="text-xs text-neutral-600 hover:text-neutral-400 transition-colors no-underline">{l}</a>
+                ))}
+              </div>
+            </div>
+          </div>
+        </footer>
+
+      </div>
+    </>
   )
 }

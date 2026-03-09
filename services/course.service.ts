@@ -501,3 +501,40 @@ class CourseService {
 
 export const courseService = new CourseService()
 
+// ----- PUBLIC CATEGORIES (No Auth Required) -----
+export interface CategoriesResponse {
+  status: boolean
+  message: string
+  data: {
+    categories: Category[]
+    pagination: {
+      current_page: number
+      total: number
+      per_page: number
+      last_page: number
+    }
+  }
+}
+
+export async function fetchAllCategories(): Promise<Category[]> {
+  try {
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8003/api/v1'
+    const response = await fetch(`${apiUrl}/admin/categories`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      },
+    })
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch categories: ${response.statusText}`)
+    }
+
+    const data: CategoriesResponse = await response.json()
+    return data.data.categories
+  } catch (error) {
+    console.error('Failed to fetch categories:', error)
+    throw error
+  }
+}

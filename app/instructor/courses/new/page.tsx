@@ -1,9 +1,10 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Button } from '@/components/shared/Button'
 import { Input } from '@/components/shared/Input'
 import { Form, FormField } from '@/components/shared/Form'
+import { fetchAllCategories, Category } from '@/services/course.service'
 
 export default function CreateCoursePage() {
   const [formData, setFormData] = useState({
@@ -12,6 +13,26 @@ export default function CreateCoursePage() {
     category_id: '',
     price: '',
   })
+
+  const [categories, setCategories] = useState<Category[]>([])
+  const [categoriesLoading, setCategoriesLoading] = useState(true)
+
+  useEffect(() => {
+    loadCategories()
+  }, [])
+
+  const loadCategories = async () => {
+    try {
+      setCategoriesLoading(true)
+      const data = await fetchAllCategories()
+      setCategories(data)
+    } catch (error) {
+      console.error('Failed to load categories:', error)
+      setCategories([])
+    } finally {
+      setCategoriesLoading(false)
+    }
+  }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target
@@ -59,11 +80,14 @@ export default function CreateCoursePage() {
               value={formData.category_id}
               onChange={handleChange}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              disabled={categoriesLoading}
             >
               <option value="">Select a category</option>
-              <option value="1">Development</option>
-              <option value="2">Design</option>
-              <option value="3">Business</option>
+              {categories.map((cat) => (
+                <option key={cat.id} value={cat.id}>
+                  {cat.name}
+                </option>
+              ))}
             </select>
           </FormField>
 

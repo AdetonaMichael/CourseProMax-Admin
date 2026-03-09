@@ -1,7 +1,9 @@
+'use client'
+
 import React, { useState } from 'react';
 import { VideoEditor } from './VideoEditor';
 import { QuizEditor } from './QuizEditor';
-import { Video, HelpCircle, Trash2 } from 'lucide-react';
+import { Video, HelpCircle, Trash2, BookOpen, GripVertical } from 'lucide-react';
 import { useConfirmation } from '@/components/shared/ConfirmationDialog';
 
 interface Lesson {
@@ -15,123 +17,130 @@ interface Lesson {
   is_preview: boolean;
 }
 
-export const LessonList = ({ 
-  lessons = [], 
+export const LessonList = ({
+  lessons = [],
   courseId,
-  hideAddButton 
-}: { 
+  hideAddButton,
+}: {
   lessons?: Lesson[];
   courseId?: number;
   hideAddButton?: boolean;
 }) => {
   const { confirm } = useConfirmation()
-  const [selectedLesson, setSelectedLesson] = useState<Lesson | null>(null);
-  const [showVideoEditor, setShowVideoEditor] = useState(false);
-  const [showQuizEditor, setShowQuizEditor] = useState(false);
+  const [selectedLesson, setSelectedLesson]   = useState<Lesson | null>(null)
+  const [showVideoEditor, setShowVideoEditor] = useState(false)
+  const [showQuizEditor, setShowQuizEditor]   = useState(false)
 
-  const handleAddVideo = (lesson: Lesson) => {
-    setSelectedLesson(lesson);
-    setShowVideoEditor(true);
-  };
-
-  const handleAddQuiz = (lesson: Lesson) => {
-    setSelectedLesson(lesson);
-    setShowQuizEditor(true);
-  };
+  const handleAddVideo = (lesson: Lesson) => { setSelectedLesson(lesson); setShowVideoEditor(true) }
+  const handleAddQuiz  = (lesson: Lesson) => { setSelectedLesson(lesson); setShowQuizEditor(true)  }
 
   const handleDeleteLesson = async (lessonId: number) => {
     const confirmed = await confirm({
-      title: 'Delete Lesson',
+      title:       'Delete Lesson',
       description: 'Are you sure you want to delete this lesson? This action cannot be undone.',
       confirmText: 'Delete',
-      cancelText: 'Cancel',
+      cancelText:  'Cancel',
       isDangerous: true,
     })
+    if (confirmed) console.log('Delete lesson:', lessonId)
+  }
 
-    if (confirmed) {
-      console.log('Delete lesson:', lessonId);
+  const difficultyStyle = (d: string) => {
+    switch (d.toLowerCase()) {
+      case 'beginner':     return 'bg-gray-100 text-gray-600 border-gray-200'
+      case 'intermediate': return 'bg-gray-200 text-gray-700 border-gray-300'
+      case 'advanced':     return 'bg-gray-800 text-white border-gray-700'
+      default:             return 'bg-gray-100 text-gray-600 border-gray-200'
     }
-  };
+  }
 
+  // Empty state
   if (!lessons || lessons.length === 0) {
     return (
-      <div className="lesson-list bg-white border border-gray-200 rounded-lg p-6">
-        <p className="text-gray-600 text-center">No lessons available.</p>
+      <div className="flex flex-col items-center justify-center py-16 px-6 bg-white border border-gray-200 border-dashed rounded-2xl text-center">
+        <div className="w-12 h-12 rounded-xl bg-gray-100 flex items-center justify-center mb-4">
+          <BookOpen size={20} className="text-gray-400" />
+        </div>
+        <p className="text-sm font-medium text-gray-700 mb-1">No lessons yet</p>
+        <p className="text-xs text-gray-400 font-light max-w-xs">
+          Add your first lesson to start building this course curriculum.
+        </p>
       </div>
-    );
+    )
   }
 
   return (
-    <div className="lesson-list">
-      <div className="space-y-3">
-        {lessons.map((lesson) => (
+    <>
+      <div className="flex flex-col gap-2">
+        {lessons.map((lesson, index) => (
           <div
             key={lesson.id}
-            className="flex gap-4 items-start p-4 bg-white border border-gray-200 rounded-lg hover:border-gray-400 hover:shadow-md transition"
+            className="group flex items-start gap-4 px-4 py-4 bg-white border border-gray-200 rounded-xl hover:border-gray-300 hover:shadow-sm transition-all duration-200"
           >
-            {/* Lesson Order Badge */}
-            <div className="flex items-center justify-center w-10 h-10 bg-gray-100 border-2 border-gray-300 rounded-lg font-bold text-gray-700 flex-shrink-0">
-              {lesson.order}
+            {/* Drag handle + order */}
+            <div className="flex flex-col items-center gap-1 pt-0.5 shrink-0">
+              <GripVertical size={14} className="text-gray-300 group-hover:text-gray-400 transition-colors cursor-grab" />
+              <span className="text-xs font-bold text-gray-400 w-5 text-center">{lesson.order}</span>
             </div>
 
-            {/* Lesson Details */}
+            {/* Content */}
             <div className="flex-1 min-w-0">
-              <h4 className="font-bold text-black text-sm mb-1">{lesson.title}</h4>
-              <p className="text-xs text-gray-600 mb-3 line-clamp-2">{lesson.description}</p>
-              <div className="flex flex-wrap gap-2">
-                <span className="px-2 py-1 bg-gray-100 border border-gray-300 rounded text-xs text-gray-700 font-semibold">
+              <div className="flex items-start justify-between gap-3 mb-1">
+                <h4 className="text-sm font-semibold text-black leading-snug truncate">
+                  {lesson.title}
+                </h4>
+              </div>
+              <p className="text-xs text-gray-400 font-light leading-relaxed line-clamp-2 mb-3">
+                {lesson.description}
+              </p>
+
+              {/* Badges */}
+              <div className="flex flex-wrap items-center gap-1.5">
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-gray-100 border border-gray-200 rounded-md text-xs text-gray-600 font-medium">
                   {lesson.estimated_duration_minutes}m
                 </span>
-                <span
-                  className={`px-2 py-1 rounded text-xs font-semibold border ${
-                    lesson.difficulty === 'Beginner'
-                      ? 'bg-green-100 text-green-800 border-green-300'
-                      : lesson.difficulty === 'Intermediate'
-                      ? 'bg-yellow-100 text-yellow-800 border-yellow-300'
-                      : 'bg-red-100 text-red-800 border-red-300'
-                  }`}
-                >
+                <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium border ${difficultyStyle(lesson.difficulty)}`}>
                   {lesson.difficulty}
                 </span>
-                <span
-                  className={`px-2 py-1 rounded text-xs font-semibold ${
-                    lesson.is_active ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-700'
-                  }`}
-                >
+                <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium border ${
+                  lesson.is_active
+                    ? 'bg-gray-900 text-white border-gray-800'
+                    : 'bg-gray-100 text-gray-500 border-gray-200'
+                }`}>
                   {lesson.is_active ? 'Active' : 'Inactive'}
                 </span>
                 {lesson.is_preview && (
-                  <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs font-semibold">
-                    Preview
+                  <span className="inline-flex items-center px-2 py-0.5 bg-gray-100 text-gray-600 border border-gray-200 rounded-md text-xs font-medium">
+                    Free Preview
                   </span>
                 )}
               </div>
             </div>
 
-            {/* Action Buttons */}
-            <div className="flex gap-2 flex-shrink-0">
+            {/* Actions */}
+            <div className="flex items-center gap-1.5 shrink-0 pt-0.5">
               <button
                 onClick={() => handleAddVideo(lesson)}
-                className="flex items-center gap-2 px-3 py-2 bg-black text-white rounded hover:bg-gray-800 transition text-xs font-semibold"
                 title="Add Video"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-black text-white rounded-lg text-xs font-medium hover:opacity-80 transition-opacity"
               >
-                <Video size={14} />
+                <Video size={13} />
                 <span className="hidden sm:inline">Video</span>
               </button>
               <button
                 onClick={() => handleAddQuiz(lesson)}
-                className="flex items-center gap-2 px-3 py-2 bg-gray-700 text-white rounded hover:bg-gray-800 transition text-xs font-semibold"
                 title="Add Quiz"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gray-800 text-white rounded-lg text-xs font-medium hover:opacity-80 transition-opacity"
               >
-                <HelpCircle size={14} />
+                <HelpCircle size={13} />
                 <span className="hidden sm:inline">Quiz</span>
               </button>
               <button
                 onClick={() => handleDeleteLesson(lesson.id)}
-                className="flex items-center gap-2 px-3 py-2 bg-gray-400 text-black rounded hover:bg-gray-500 transition text-xs font-semibold"
                 title="Delete Lesson"
+                className="inline-flex items-center justify-center w-8 h-8 rounded-lg text-gray-400 border border-gray-200 hover:border-red-200 hover:text-red-500 hover:bg-red-50 transition-all"
               >
-                <Trash2 size={14} />
+                <Trash2 size={13} />
               </button>
             </div>
           </div>
@@ -140,15 +149,12 @@ export const LessonList = ({
 
       {/* Video Editor Modal */}
       {showVideoEditor && selectedLesson && courseId && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 overflow-y-auto">
-          <div className="bg-white rounded-xl max-w-2xl w-full my-8 p-0 shadow-2xl">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50 overflow-y-auto">
+          <div className="bg-white rounded-2xl max-w-2xl w-full my-8 shadow-2xl border border-gray-100">
             <VideoEditor
               courseId={courseId}
               lessonId={selectedLesson.id}
-              onClose={() => {
-                setShowVideoEditor(false);
-                setSelectedLesson(null);
-              }}
+              onClose={() => { setShowVideoEditor(false); setSelectedLesson(null) }}
             />
           </div>
         </div>
@@ -156,20 +162,17 @@ export const LessonList = ({
 
       {/* Quiz Editor Modal */}
       {showQuizEditor && selectedLesson && courseId && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 overflow-y-auto">
-          <div className="bg-white rounded-xl max-w-4xl w-full my-8 shadow-2xl">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50 overflow-y-auto">
+          <div className="bg-white rounded-2xl max-w-4xl w-full my-8 shadow-2xl border border-gray-100">
             <QuizEditor
               courseId={courseId}
               lessonId={selectedLesson.id}
               lesson={selectedLesson}
-              onClose={() => {
-                setShowQuizEditor(false);
-                setSelectedLesson(null);
-              }}
+              onClose={() => { setShowQuizEditor(false); setSelectedLesson(null) }}
             />
           </div>
         </div>
       )}
-    </div>
-  );
-};
+    </>
+  )
+}

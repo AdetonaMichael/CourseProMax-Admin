@@ -104,7 +104,7 @@ export default function EditCoursePage() {
       <div className="bg-white min-h-screen p-4 md:p-6 lg:p-8">
         <div className="w-full">
           <div className="edit-course-page">
-            <div className="page-header">
+            <div className="page-header text-gray-900">
               <button
                 onClick={() => router.back()}
                 className="back-button"

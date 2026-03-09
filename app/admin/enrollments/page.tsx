@@ -4,44 +4,12 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { AdminLayout } from '@/components/admin/AdminLayout'
 import { Button } from '@/components/shared/Button'
-import { fetchEnrollments, handleAPIError } from '@/services/admin.service'
+import { fetchEnrollments, handleAPIError, type EnrollmentListItem, type EnrollmentsListResponse } from '@/services/admin.service'
 
-interface EnrollmentData {
-  id: number
-  course_id: string
-  user_id: string
-  title: string
-  instructor: string
-  progress: string
-  total_lessons: string
-  completed_lessons: string
-  next_lesson?: string
-  next_lesson_id?: number
-  due_date: string | null
-  time_left: string | null
-  difficulty: string
-  image?: string
-  last_accessed: string | null
-  enrolled_at: string
-  completed_at: string | null
-  paused_at: string | null
-  status: 'active' | 'paused' | 'completed' | 'withdrawn'
-  is_completed: boolean
-  is_paused: boolean
-  is_active: boolean
-  grade: string | null
-  certificate_issued: boolean
-  unenroll_reason: string | null
-}
-
-interface EnrollmentsResponse {
-  enrollments: EnrollmentData[]
-  pagination: {
-    current_page: number
-    total: number
-    per_page: number
-    last_page: number
-  }
+interface Filters {
+  search: string
+  status: 'all' | 'active' | 'completed' | 'paused' | 'withdrawn'
+  per_page: number
 }
 
 const statusBadgeColor = (status: string) => {
@@ -59,8 +27,8 @@ const statusBadgeColor = (status: string) => {
   }
 }
 
-const difficultyColor = (difficulty: string) => {
-  switch (difficulty?.toLowerCase()) {
+const levelColor = (level: string) => {
+  switch (level?.toLowerCase()) {
     case 'beginner':
       return 'bg-green-50 text-green-700 border border-green-200'
     case 'intermediate':
@@ -73,7 +41,7 @@ const difficultyColor = (difficulty: string) => {
 }
 
 export default function EnrollmentsPage() {
-  const [enrollments, setEnrollments] = useState<EnrollmentData[]>([])
+  const [enrollments, setEnrollments] = useState<EnrollmentListItem[]>([])
   const [pagination, setPagination] = useState({
     current_page: 1,
     total: 0,
@@ -83,9 +51,10 @@ export default function EnrollmentsPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [page, setPage] = useState(1)
-  const [filters, setFilters] = useState({
+  const [filters, setFilters] = useState<Filters>({
     search: '',
     status: 'all',
+    per_page: 15,
   })
 
   useEffect(() => {
@@ -97,11 +66,11 @@ export default function EnrollmentsPage() {
     try {
       setLoading(true)
       setError(null)
-      const response = await fetchEnrollments(page, {
-        per_page: 15,
+      const response = (await fetchEnrollments(page, {
+        per_page: filters.per_page,
         status: filters.status === 'all' ? undefined : filters.status,
         search: filters.search || undefined,
-      }) as unknown as EnrollmentsResponse
+      })) as unknown as EnrollmentsListResponse
 
       setEnrollments(response.enrollments)
       setPagination(response.pagination)
@@ -173,7 +142,7 @@ export default function EnrollmentsPage() {
                 type="text"
                 value={filters.search}
                 onChange={(e) => setFilters(prev => ({ ...prev, search: e.target.value }))}
-                placeholder="Search by course or student..."
+                placeholder="Search by email, name, or course..."
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 disabled={loading}
               />
@@ -213,12 +182,13 @@ export default function EnrollmentsPage() {
                 <table className="w-full">
                   <thead>
                     <tr className="bg-gray-50 border-b border-gray-200">
+                      <th className="text-left py-3 px-4 font-semibold text-gray-700 text-sm">Student</th>
                       <th className="text-left py-3 px-4 font-semibold text-gray-700 text-sm">Course</th>
-                      <th className="text-left py-3 px-4 font-semibold text-gray-700 text-sm">Student ID</th>
                       <th className="text-left py-3 px-4 font-semibold text-gray-700 text-sm">Progress</th>
-                      <th className="text-left py-3 px-4 font-semibold text-gray-700 text-sm">Difficulty</th>
+                      <th className="text-left py-3 px-4 font-semibold text-gray-700 text-sm">Level</th>
                       <th className="text-left py-3 px-4 font-semibold text-gray-700 text-sm">Status</th>
-                      <th className="text-left py-3 px-4 font-semibold text-gray-700 text-sm">Enrolled</th>
+                      <th className="text-left py-3 px-4 font-semibold text-gray-700 text-sm">Last Accessed</th>
+                      <th className="text-left py-3 px-4 font-semibold text-gray-700 text-sm">Enrolled Date</th>
                       <th className="text-left py-3 px-4 font-semibold text-gray-700 text-sm">Actions</th>
                     </tr>
                   </thead>
@@ -226,28 +196,40 @@ export default function EnrollmentsPage() {
                     {enrollments.map((enrollment, index) => (
                       <tr key={enrollment.id} className={`border-b border-gray-100 hover:bg-gray-50 ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}`}>
                         <td className="py-3 px-4">
-                          <div>
-                            <p className="font-medium text-gray-900 text-sm">{enrollment.title}</p>
-                            <p className="text-xs text-gray-600 mt-1">By {enrollment.instructor}</p>
+                          <div className="flex items-center gap-2">
+                            <img
+                              src={enrollment.user.avatar || `https://ui-avatars.com/api/?name=${enrollment.user.full_name}`}
+                              alt={enrollment.user.full_name}
+                              className="w-8 h-8 rounded-full"
+                            />
+                            <div>
+                              <p className="font-medium text-gray-900 text-sm">{enrollment.user.full_name}</p>
+                              <p className="text-xs text-gray-600">{enrollment.user.email}</p>
+                            </div>
                           </div>
                         </td>
                         <td className="py-3 px-4">
-                          <p className="text-sm text-gray-700">User #{enrollment.user_id}</p>
+                          <div>
+                            <p className="font-medium text-gray-900 text-sm">{enrollment.course.title}</p>
+                            <p className="text-xs text-gray-600">By {enrollment.course.instructor}</p>
+                          </div>
                         </td>
                         <td className="py-3 px-4">
                           <div className="flex items-center gap-2">
                             <div className="w-16 bg-gray-200 rounded-full h-2">
                               <div
                                 className="bg-blue-500 h-2 rounded-full transition-all"
-                                style={{ width: `${Math.min(Number(enrollment.progress), 100)}%` }}
+                                style={{ width: `${Math.min(enrollment.progress, 100)}%` }}
                               />
                             </div>
-                            <span className="text-xs text-gray-600 font-medium">{enrollment.progress}%</span>
+                            <span className="text-xs text-gray-600 font-medium">
+                              {enrollment.completed_lessons}/{enrollment.total_lessons}
+                            </span>
                           </div>
                         </td>
                         <td className="py-3 px-4">
-                          <span className={`px-2 py-1 rounded text-xs font-medium ${difficultyColor(enrollment.difficulty)}`}>
-                            {enrollment.difficulty}
+                          <span className={`px-2 py-1 rounded text-xs font-medium ${levelColor(enrollment.course.level)}`}>
+                            {enrollment.course.level}
                           </span>
                         </td>
                         <td className="py-3 px-4">
@@ -256,18 +238,16 @@ export default function EnrollmentsPage() {
                           </span>
                         </td>
                         <td className="py-3 px-4">
-                          <div className="text-sm text-gray-600">
-                            <p>{new Date(enrollment.enrolled_at).toLocaleDateString()}</p>
-                            {enrollment.last_accessed && (
-                              <p className="text-xs text-gray-500 mt-1">Accessed: {enrollment.last_accessed}</p>
-                            )}
-                          </div>
+                          <p className="text-sm text-gray-600">{enrollment.last_accessed}</p>
+                        </td>
+                        <td className="py-3 px-4">
+                          <p className="text-sm text-gray-600">{new Date(enrollment.enrolled_at).toLocaleDateString()}</p>
                         </td>
                         <td className="py-3 px-4">
                           <div className="flex gap-2">
                             <Link href={`/admin/enrollments/${enrollment.id}`}>
                               <Button variant="ghost" size="sm">
-                                View
+                                View Details
                               </Button>
                             </Link>
                           </div>

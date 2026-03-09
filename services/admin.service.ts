@@ -443,6 +443,166 @@ export interface Enrollment {
   completed_at?: string;
 }
 
+export interface EnrollmentUser {
+  id: number;
+  email: string;
+  first_name: string;
+  last_name: string;
+  full_name: string;
+  phone: string;
+  avatar?: string;
+  status?: string;
+}
+
+export interface EnrollmentCourse {
+  id: number;
+  title: string;
+  description?: string;
+  instructor: string;
+  level: 'Beginner' | 'Intermediate' | 'Advanced';
+  thumbnail?: string;
+  category?: string;
+  total_lessons: number;
+  duration?: string;
+  ai_score?: number;
+  price?: number;
+  price_naira?: number;
+  is_free: boolean;
+  is_paid: boolean;
+  certificate_available: boolean;
+  rating?: number;
+}
+
+export interface EnrollmentListItem {
+  id: number;
+  course_id: number;
+  user_id: number;
+  user: EnrollmentUser;
+  course: EnrollmentCourse;
+  progress: number;
+  total_lessons: number;
+  completed_lessons: number;
+  next_lesson?: string;
+  next_lesson_id?: number;
+  status: 'active' | 'paused' | 'completed' | 'withdrawn';
+  is_active: boolean;
+  is_completed: boolean;
+  is_paused: boolean;
+  grade?: string | null;
+  certificate_issued: boolean;
+  enrolled_at: string;
+  completed_at?: string | null;
+  paused_at?: string | null;
+  last_accessed: string;
+  unenroll_reason?: string | null;
+}
+
+export interface EnrollmentsListResponse {
+  enrollments: EnrollmentListItem[];
+  pagination: {
+    current_page: number;
+    total: number;
+    per_page: number;
+    last_page: number;
+  };
+}
+
+export interface LessonProgress {
+  id: number;
+  lesson_id: number;
+  lesson_title: string;
+  lesson_type: 'video' | 'reading' | 'quiz' | 'assignment' | 'interactive' | 'mixed' | 'resource';
+  completed: boolean;
+  score?: number | null;
+  time_spent_minutes: number;
+  started_at?: string | null;
+  completed_at?: string | null;
+}
+
+export interface AssignmentSubmission {
+  id: number;
+  assignment_id: number;
+  assignment_title: string;
+  status: 'pending' | 'submitted' | 'graded';
+  score?: number | null;
+  feedback?: string | null;
+  submitted_at?: string | null;
+  graded_at?: string | null;
+  created_at: string;
+}
+
+export interface EnrollmentProgress {
+  percentage: number;
+  lessons_completed: number;
+  total_lessons: number;
+  next_lesson?: {
+    id: number;
+    title: string;
+    type: string;
+    order: number;
+  };
+}
+
+export interface EnrollmentTimeline {
+  enrolled_at: string;
+  last_accessed_at: string;
+  completed_at?: string | null;
+  paused_at?: string | null;
+  duration_days?: number;
+}
+
+export interface EnrollmentPayment {
+  method: string;
+  payment_id: number;
+}
+
+export interface EnrollmentAssignments {
+  total: number;
+  pending: number;
+  submitted: number;
+  graded: number;
+  data: AssignmentSubmission[];
+}
+
+export interface EnrollmentLessonProgress {
+  total_tracked: number;
+  completed: number;
+  in_progress: number;
+  data: LessonProgress[];
+}
+
+export interface EnrollmentStatistics {
+  average_score: number;
+  total_time_spent_minutes: number;
+  completion_rate_percentage: number;
+  assignment_completion_rate: number;
+}
+
+export interface EnrollmentDetail {
+  id: number;
+  course_id: number;
+  user_id: number;
+  user: EnrollmentUser;
+  course: EnrollmentCourse;
+  status: 'active' | 'paused' | 'completed' | 'withdrawn';
+  is_active: boolean;
+  is_completed: boolean;
+  is_paused: boolean;
+  grade?: string | null;
+  certificate_issued: boolean;
+  unenroll_reason?: string | null;
+  progress: EnrollmentProgress;
+  timeline: EnrollmentTimeline;
+  payment?: EnrollmentPayment;
+  assignments: EnrollmentAssignments;
+  lesson_progress: EnrollmentLessonProgress;
+  statistics: EnrollmentStatistics;
+}
+
+export interface EnrollmentDetailResponse {
+  enrollment: EnrollmentDetail;
+}
+
 export interface EnrollmentsResponse {
   enrollments: Enrollment[];
   pagination: {
@@ -467,6 +627,17 @@ export async function fetchEnrollments(page = 1, filters: Record<string, any> = 
         search: filters.search,
       },
     });
+    return response.data.data;
+  } catch (error) {
+    throw handleAPIError(error);
+  }
+}
+
+export async function fetchEnrollmentDetail(enrollmentId: number): Promise<EnrollmentDetailResponse> {
+  try {
+    const api = await initializeAPI();
+    console.log('[Admin API] Fetching enrollment detail:', { enrollmentId });
+    const response = await api.get(`/admin/enrollments/${enrollmentId}`);
     return response.data.data;
   } catch (error) {
     throw handleAPIError(error);

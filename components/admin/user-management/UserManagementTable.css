@@ -20,6 +20,7 @@
   width: 100%;
   border-collapse: collapse;
   font-size: 13px;
+  table-layout: fixed;
 }
 
 .users-table thead {
@@ -28,12 +29,14 @@
 }
 
 .users-table th {
-  padding: 12px 14px;
+  padding: 12px 8px;
   text-align: left;
   font-weight: 600;
   color: #2d3748;
   white-space: nowrap;
   font-size: 12px;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .users-table th.sortable {
@@ -57,13 +60,16 @@
 
 /* Table Cells */
 .users-table td {
-  padding: 12px 14px;
+  padding: 12px 8px;
   color: #2d3748;
   font-size: 13px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .checkbox-col {
-  width: 40px;
+  width: 50px;
   padding: 12px 8px;
   text-align: center;
 }
@@ -75,25 +81,29 @@
 }
 
 .email-col {
+  width: 22%;
   font-weight: 600;
   color: #3182ce;
   word-break: break-word;
-  min-width: 150px;
+  white-space: normal;
 }
 
 .name-col {
+  width: 15%;
   font-weight: 500;
-  min-width: 120px;
+  white-space: normal;
 }
 
 .roles-col {
-  min-width: 140px;
+  width: 18%;
+  white-space: normal;
 }
 
 .role-badges {
   display: flex;
   flex-wrap: wrap;
   gap: 4px;
+  white-space: normal;
 }
 
 .role-badge {
@@ -107,10 +117,11 @@
   text-transform: uppercase;
   letter-spacing: 0.2px;
   white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .status-col {
-  min-width: 100px;
+  width: 12%;
 }
 
 .status-badge {
@@ -139,23 +150,23 @@
 }
 
 .phone-col {
+  width: 13%;
   color: #718096;
-  min-width: 120px;
   display: none;
 }
 
 .date-col {
+  width: 13%;
   color: #718096;
   font-size: 12px;
   white-space: nowrap;
-  min-width: 100px;
 }
 
 /* Actions Column */
 .actions-col {
-  min-width: 120px;
+  width: 10%;
   text-align: center;
-  padding: 12px 8px;
+  padding: 12px 4px;
 }
 
 .action-buttons {

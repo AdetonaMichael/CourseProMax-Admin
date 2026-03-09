@@ -1,9 +1,9 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { AlertCircle } from 'lucide-react'
 import { Button } from '@/components/shared/Button'
-import { courseService, Course, CreateCourseRequest } from '@/services/course.service'
+import { courseService, Course, CreateCourseRequest, fetchAllCategories, Category } from '@/services/course.service'
 import './CourseForm.css'
 
 interface CourseFormProps {
@@ -37,6 +37,25 @@ export default function CourseForm({ course, loading = false, onSubmit, onError 
   const [submitting, setSubmitting] = useState(false)
   const [errors, setErrors] = useState<FormErrors>({})
   const [submitError, setSubmitError] = useState<string | null>(null)
+  const [categories, setCategories] = useState<Category[]>([])
+  const [categoriesLoading, setCategoriesLoading] = useState(true)
+
+  useEffect(() => {
+    loadCategories()
+  }, [])
+
+  const loadCategories = async () => {
+    try {
+      setCategoriesLoading(true)
+      const data = await fetchAllCategories()
+      setCategories(data)
+    } catch (error) {
+      console.error('Failed to load categories:', error)
+      setCategories([])
+    } finally {
+      setCategoriesLoading(false)
+    }
+  }
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
@@ -169,14 +188,14 @@ export default function CourseForm({ course, loading = false, onSubmit, onError 
               name="category_id"
               value={formData.category_id}
               onChange={handleInputChange}
-              disabled={submitting}
+              disabled={submitting || categoriesLoading}
             >
               <option value={0}>Select a category</option>
-              <option value={1}>Technology</option>
-              <option value={2}>Design</option>
-              <option value={3}>Business</option>
-              <option value={4}>Marketing</option>
-              <option value={5}>Other</option>
+              {categories.map((cat) => (
+                <option key={cat.id} value={cat.id}>
+                  {cat.name}
+                </option>
+              ))}
             </select>
             {errors.category_id && <p className="error-text">{errors.category_id[0]}</p>}
           </div>

@@ -1,8 +1,9 @@
 'use client'
 
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { Search, RotateCcw } from 'lucide-react'
 import { Button } from '@/components/shared/Button'
+import { fetchAllCategories, Category } from '@/services/course.service'
 import './CourseFiltersBar.css'
 
 interface CourseFiltersBarProps {
@@ -28,6 +29,37 @@ export default function CourseFiltersBar({
   onReset,
   loading = false,
 }: CourseFiltersBarProps) {
+  const [categories, setCategories] = useState<Category[]>([])
+  const [categoriesLoading, setCategoriesLoading] = useState(true)
+  const [localSearch, setLocalSearch] = useState(search)
+
+  useEffect(() => {
+    loadCategories()
+  }, [])
+
+  useEffect(() => {
+    setLocalSearch(search)
+  }, [search])
+
+  const loadCategories = async () => {
+    try {
+      setCategoriesLoading(true)
+      const data = await fetchAllCategories()
+      setCategories(data)
+    } catch (error) {
+      console.error('Failed to load categories:', error)
+      setCategories([])
+    } finally {
+      setCategoriesLoading(false)
+    }
+  }
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value
+    setLocalSearch(value)
+    onSearchChange(value)
+  }
+
   return (
     <div className="courses-filters">
       <form onSubmit={onSearch} className="filters-form">
@@ -35,8 +67,8 @@ export default function CourseFiltersBar({
           <Search size={18} className="search-icon" />
           <input
             type="text"
-            value={search}
-            onChange={(e) => onSearchChange(e.target.value)}
+            value={localSearch}
+            onChange={handleSearchChange}
             placeholder="Search courses by title, instructor..."
             className="filter-input"
             disabled={loading}
@@ -64,14 +96,14 @@ export default function CourseFiltersBar({
             value={category}
             onChange={(e) => onCategoryChange(e.target.value)}
             className="filter-select"
-            disabled={loading}
+            disabled={loading || categoriesLoading}
           >
             <option value="">All Categories</option>
-            <option value="programming">Programming</option>
-            <option value="design">Design</option>
-            <option value="business">Business</option>
-            <option value="marketing">Marketing</option>
-            <option value="other">Other</option>
+            {categories.map((cat) => (
+              <option key={cat.id} value={cat.id}>
+                {cat.name}
+              </option>
+            ))}
           </select>
         </div>
 

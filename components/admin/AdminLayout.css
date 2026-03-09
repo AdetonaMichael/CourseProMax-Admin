@@ -205,7 +205,13 @@
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   background: #f7fafc;
+  background-image:
+    linear-gradient(#e8e8e8 1px, transparent 1px),
+    linear-gradient(90deg, #e8e8e8 1px, transparent 1px);
+  background-size: 60px 60px;
+  background-attachment: local;
   padding: 24px;
+  position: relative;
 }
 
 /* Responsive Design */

@@ -15,8 +15,11 @@ import {
   blockUser,
   unblockUser,
   assignRoleToUser,
+  revokeRoleFromUser,
+  fetchRoles,
   changeUserStatus,
   type UsersResponse,
+  type Role,
   handleAPIError,
 } from '@/services/admin.service'
 import { useNotification } from '@/hooks/useNotification'
@@ -44,6 +47,7 @@ export default function UserManagementTable({ onDataChange }: UserManagementTabl
   const { confirm } = useConfirmation()
   const { prompt } = usePrompt()
   const [users, setUsers] = useState<any[]>([])
+  const [roles, setRoles] = useState<Role[]>([])
   const [pagination, setPagination] = useState({
     current_page: 1,
     total: 0,
@@ -59,15 +63,33 @@ export default function UserManagementTable({ onDataChange }: UserManagementTabl
     per_page: 20,
   })
   const [loading, setLoading] = useState(false)
+  const [rolesLoading, setRolesLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [selectedUsers, setSelectedUsers] = useState<number[]>([])
   const [selectedUserView, setSelectedUserView] = useState<any | null>(null)
   const [showDetailsDrawer, setShowDetailsDrawer] = useState(false)
 
+  // Load roles on mount
+  useEffect(() => {
+    loadRoles()
+  }, [])
+
   // Load users when filters or page changes
   useEffect(() => {
     loadUsers()
   }, [filters, pagination.current_page])
+
+  async function loadRoles() {
+    try {
+      setRolesLoading(true)
+      const data = await fetchRoles()
+      setRoles(data)
+    } catch (err: any) {
+      console.error('Failed to load roles:', err)
+    } finally {
+      setRolesLoading(false)
+    }
+  }
 
   async function loadUsers() {
     try {
@@ -158,14 +180,20 @@ export default function UserManagementTable({ onDataChange }: UserManagementTabl
   }
 
   const handleChangeRole = async (userId: number) => {
-    const availableRoles = ['student', 'instructor', 'admin', 'moderator']
+    if (roles.length === 0) {
+      notification.error('Roles not loaded yet')
+      return
+    }
+
+    const roleNames = roles.map((r) => r.name)
+    const roleInputs = roleNames.join(', ')
     const roleInput = await prompt({
       title: 'Assign Role',
-      message: `Available roles: ${availableRoles.join(', ')}`,
-      placeholder: 'Enter role to assign',
+      message: `Available roles: ${roleInputs}. Enter role to assign:`,
+      placeholder: 'e.g., instructor',
     })
 
-    if (!roleInput || !availableRoles.includes(roleInput.toLowerCase())) {
+    if (!roleInput || !roleNames.includes(roleInput.toLowerCase())) {
       notification.error('Invalid role selected')
       return
     }
@@ -177,6 +205,29 @@ export default function UserManagementTable({ onDataChange }: UserManagementTabl
       notification.success('Role assigned successfully')
     } catch (err: any) {
       notification.error('Error assigning role: ' + (err.message || 'Unknown error'))
+    }
+  }
+
+  const handleRevokeRole = async (userId: number, roleName: string) => {
+    const confirmed = await confirm({
+      title: 'Revoke Role',
+      description: `Are you sure you want to revoke the ${roleName} role from this user?`,
+      confirmText: 'Revoke',
+      cancelText: 'Cancel',
+      isDangerous: true,
+    })
+
+    if (!confirmed) {
+      return
+    }
+
+    try {
+      await revokeRoleFromUser(userId, [roleName])
+      await loadUsers()
+      onDataChange?.()
+      notification.success('Role revoked successfully')
+    } catch (err: any) {
+      notification.error('Error revoking role: ' + (err.message || 'Unknown error'))
     }
   }
 
