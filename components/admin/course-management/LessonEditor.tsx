@@ -20,8 +20,10 @@ export const LessonEditor = ({ courseId, onClose }: { courseId: number; onClose:
     e.preventDefault()
     setError('')
 
-    if (!title.trim())       { setError('Lesson title is required');       return }
-    if (!description.trim()) { setError('Lesson description is required'); return }
+    if (!title.trim())              { setError('Lesson title is required');       return }
+    if (title.length > 255)         { setError('Lesson title cannot exceed 255 characters'); return }
+    if (!description.trim())        { setError('Lesson description is required'); return }
+    if (description.length > 5000)  { setError('Lesson description cannot exceed 5000 characters'); return }
 
     try {
       setSaving(true)
@@ -104,30 +106,48 @@ export const LessonEditor = ({ courseId, onClose }: { courseId: number; onClose:
 
         {/* Title */}
         <div className="flex flex-col gap-1.5">
-          <label className="text-xs font-medium text-gray-700 tracking-wide">
-            Lesson Title <span className="text-red-400">*</span>
-          </label>
+          <div className="flex items-center justify-between">
+            <label className="text-xs font-medium text-gray-700 tracking-wide">
+              Lesson Title <span className="text-red-400">*</span>
+            </label>
+            <span className={`text-xs font-medium ${title.length > 240 ? 'text-red-500' : 'text-gray-400'}`}>
+              {title.length}/255
+            </span>
+          </div>
           <input
             type="text"
             value={title}
             onChange={e => setTitle(e.target.value)}
+            maxLength={255}
             placeholder="e.g. Introduction to Variables"
-            className={inputClass}
+            className={`${inputClass} ${title.length > 240 ? 'border-red-200 bg-red-50' : ''}`}
           />
+          {title.length > 240 && (
+            <p className="text-xs text-red-500 font-medium">Maximum 255 characters ({255 - title.length} remaining)</p>
+          )}
         </div>
 
         {/* Description */}
         <div className="flex flex-col gap-1.5">
-          <label className="text-xs font-medium text-gray-700 tracking-wide">
-            Description <span className="text-red-400">*</span>
-          </label>
+          <div className="flex items-center justify-between">
+            <label className="text-xs font-medium text-gray-700 tracking-wide">
+              Description <span className="text-red-400">*</span>
+            </label>
+            <span className={`text-xs font-medium ${description.length > 4700 ? 'text-red-500' : 'text-gray-400'}`}>
+              {description.length}/5000
+            </span>
+          </div>
           <textarea
             value={description}
             onChange={e => setDescription(e.target.value)}
             placeholder="What will students learn in this lesson?"
+            maxLength={5000}
             rows={3}
-            className={`${inputClass} resize-none`}
+            className={`${inputClass} resize-none ${description.length > 4700 ? 'border-red-200 bg-red-50' : ''}`}
           />
+          {description.length > 4700 && (
+            <p className="text-xs text-red-500 font-medium">Maximum 5000 characters ({5000 - description.length} remaining)</p>
+          )}
         </div>
 
         {/* Duration + Difficulty */}

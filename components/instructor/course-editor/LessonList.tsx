@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react'
 import { Lesson } from '@/types'
 import { lessonService } from '@/services/lesson.service'
-import { Trash2, Edit, Play, HelpCircle, Plus } from 'lucide-react'
+import { Trash2, Edit, Play, HelpCircle, Plus, Video, CheckCircle2 } from 'lucide-react'
 import { useConfirmation } from '@/components/shared/ConfirmationDialog'
 
 interface LessonListProps {
@@ -37,6 +37,7 @@ export const LessonList: React.FC<LessonListProps> = ({
       setLoading(true)
       setError(null)
       const data = await lessonService.getLessonsByCourse(courseId)
+      console.log('📋 LessonList received lessons:', data)
       setLessons(data)
     } catch (err) {
       console.error('Failed to fetch lessons:', err)
@@ -118,10 +119,45 @@ export const LessonList: React.FC<LessonListProps> = ({
       )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-        {lessons.map((lesson) => (
+        {lessons.map((lesson) => {
+          // Check for video: has bunny_video_id OR type is 'video'
+          const hasVideo = (!!lesson.bunny_video_id && lesson.bunny_video_id.trim() !== '') || lesson.type === 'video'
+          
+          // Check for quiz: type is 'quiz' OR has completion_score_required > 0
+          const completionScore = lesson.completion_score_required 
+            ? parseFloat(lesson.completion_score_required.toString()) 
+            : 0
+          const hasQuiz = lesson.type === 'quiz' || completionScore > 0
+          
+          console.log(`📊 Lesson "${lesson.title}":`, {
+            bunny_video_id: lesson.bunny_video_id,
+            type: lesson.type,
+            completion_score_required: lesson.completion_score_required,
+            hasVideo,
+            hasQuiz,
+          })
+          
+          return (
           <div key={lesson.id} className="bg-white border border-gray-200 rounded-lg p-5 transition-all hover:border-blue-600 hover:shadow-lg hover:-translate-y-1">
             <div className="flex justify-between items-start gap-3 mb-3">
-              <h3 className="text-base font-semibold text-gray-900">{lesson.title}</h3>
+              <div className="flex-1">
+                <h3 className="text-base font-semibold text-gray-900 mb-2">{lesson.title}</h3>
+                {/* Content Indicators */}
+                <div className="flex flex-wrap gap-2 mb-2">
+                  {hasVideo && (
+                    <div className="inline-flex items-center gap-1 px-3 py-1 bg-blue-100 text-blue-700 rounded-md text-xs font-semibold border border-blue-300">
+                      <Video size={14} />
+                      Video
+                    </div>
+                  )}
+                  {hasQuiz && (
+                    <div className="inline-flex items-center gap-1 px-3 py-1 bg-amber-100 text-amber-700 rounded-md text-xs font-semibold border border-amber-300">
+                      <CheckCircle2 size={14} />
+                      Quiz
+                    </div>
+                  )}
+                </div>
+              </div>
               <span className={`inline-block px-3 py-1 rounded-full text-xs font-semibold uppercase whitespace-nowrap flex-shrink-0 ${
                 lesson.type === 'video' ? 'bg-blue-100 text-blue-700' :
                 lesson.type === 'reading' ? 'bg-purple-100 text-purple-700' :
@@ -186,7 +222,8 @@ export const LessonList: React.FC<LessonListProps> = ({
               </button>
             </div>
           </div>
-        ))}
+        )
+        })}
       </div>
     </div>
   )

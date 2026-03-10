@@ -161,7 +161,7 @@ export default function CourseDetailsPage({ params }: CourseDetailsPageProps) {
             </div>
             <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm hover:border-gray-400 hover:shadow-md transition">
               <span className="text-xs font-bold text-gray-600 uppercase tracking-wide block mb-3">Rating</span>
-              <span className="text-2xl font-bold text-black">{(Number(course.rating) || 0).toFixed(1)} ★</span>
+              <span className="text-2xl font-bold text-black">{(Number(course.rating) || 0).toFixed(1)} <span className="text-amber-400">★</span></span>
             </div>
             <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm hover:border-gray-400 hover:shadow-md transition">
               <span className="text-xs font-bold text-gray-600 uppercase tracking-wide block mb-3">Students</span>
@@ -173,7 +173,7 @@ export default function CourseDetailsPage({ params }: CourseDetailsPageProps) {
                 <span className={`inline-block px-3 py-1 rounded-lg text-sm font-bold w-fit ${course.is_active ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}`}>
                   {course.is_active ? '✓ Published' : '◯ Draft'}
                 </span>
-                <span className={`inline-block px-3 py-1 rounded-lg text-sm font-bold w-fit ${course.is_paid ? 'bg-blue-100 text-blue-800' : 'bg-purple-100 text-purple-800'}`}>
+                <span className={`inline-block px-3 py-1 rounded-lg text-sm font-bold w-fit ${course.is_paid ? 'bg-blue-100 text-blue-800' : 'bg-gray-300 text-gray-900'}`}>
                   {course.is_paid ? '💰 Paid' : '🎁 Free'}
                 </span>
               </div>

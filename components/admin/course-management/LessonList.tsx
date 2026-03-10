@@ -3,7 +3,8 @@
 import React, { useState } from 'react';
 import { VideoEditor } from './VideoEditor';
 import { QuizEditor } from './QuizEditor';
-import { Video, HelpCircle, Trash2, BookOpen, GripVertical } from 'lucide-react';
+import { QuizEditorModal } from './QuizEditorModal';
+import { Video, HelpCircle, Trash2, BookOpen, GripVertical, CheckCircle2, Edit2 } from 'lucide-react';
 import { useConfirmation } from '@/components/shared/ConfirmationDialog';
 
 interface Lesson {
@@ -15,6 +16,9 @@ interface Lesson {
   difficulty: string;
   is_active: boolean;
   is_preview: boolean;
+  bunny_video_id?: string;
+  type?: string;
+  completion_score_required?: string | number;
 }
 
 export const LessonList = ({
@@ -30,9 +34,12 @@ export const LessonList = ({
   const [selectedLesson, setSelectedLesson]   = useState<Lesson | null>(null)
   const [showVideoEditor, setShowVideoEditor] = useState(false)
   const [showQuizEditor, setShowQuizEditor]   = useState(false)
+  const [showQuizModal, setShowQuizModal]     = useState(false)
+  const [refreshTrigger, setRefreshTrigger]   = useState(0)
 
   const handleAddVideo = (lesson: Lesson) => { setSelectedLesson(lesson); setShowVideoEditor(true) }
   const handleAddQuiz  = (lesson: Lesson) => { setSelectedLesson(lesson); setShowQuizEditor(true)  }
+  const handleEditQuiz = (lesson: Lesson) => { setSelectedLesson(lesson); setShowQuizModal(true) }
 
   const handleDeleteLesson = async (lessonId: number) => {
     const confirmed = await confirm({
@@ -114,6 +121,20 @@ export const LessonList = ({
                     Free Preview
                   </span>
                 )}
+                
+                {/* Content Type Indicators */}
+                {(lesson.bunny_video_id && lesson.bunny_video_id !== "0" && lesson.bunny_video_id.trim() !== "") && (
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-blue-100 text-blue-700 border border-blue-300 rounded-md text-xs font-semibold">
+                    <Video size={12} />
+                    Has Video
+                  </span>
+                )}
+                {(lesson.type === 'quiz' || (lesson.completion_score_required && parseFloat(lesson.completion_score_required.toString()) > 0)) && (
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-amber-100 text-amber-700 border border-amber-300 rounded-md text-xs font-semibold">
+                    <CheckCircle2 size={12} />
+                    Has Quiz
+                  </span>
+                )}
               </div>
             </div>
 
@@ -127,14 +148,28 @@ export const LessonList = ({
                 <Video size={13} />
                 <span className="hidden sm:inline">Video</span>
               </button>
-              <button
-                onClick={() => handleAddQuiz(lesson)}
-                title="Add Quiz"
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gray-800 text-white rounded-lg text-xs font-medium hover:opacity-80 transition-opacity"
-              >
-                <HelpCircle size={13} />
-                <span className="hidden sm:inline">Quiz</span>
-              </button>
+
+              {/* Quiz Button - Changes based on whether quiz exists */}
+              {(lesson.type === 'quiz' || (lesson.completion_score_required && parseFloat(lesson.completion_score_required.toString()) > 0)) ? (
+                <button
+                  onClick={() => handleEditQuiz(lesson)}
+                  title="Edit Quiz"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 text-white rounded-lg text-xs font-medium hover:bg-blue-700 transition-colors"
+                >
+                  <Edit2 size={13} />
+                  <span className="hidden sm:inline">Edit Quiz</span>
+                </button>
+              ) : (
+                <button
+                  onClick={() => handleAddQuiz(lesson)}
+                  title="Add Quiz"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gray-800 text-white rounded-lg text-xs font-medium hover:opacity-80 transition-opacity"
+                >
+                  <HelpCircle size={13} />
+                  <span className="hidden sm:inline">Quiz</span>
+                </button>
+              )}
+
               <button
                 onClick={() => handleDeleteLesson(lesson.id)}
                 title="Delete Lesson"
@@ -146,6 +181,23 @@ export const LessonList = ({
           </div>
         ))}
       </div>
+      {/* Quiz Editor Modal - New multi-step form */}
+      {showQuizModal && selectedLesson && courseId && (
+        <QuizEditorModal
+          courseId={courseId}
+          lessonId={selectedLesson.id}
+          lessonTitle={selectedLesson.title}
+          isOpen={showQuizModal}
+          onClose={() => {
+            setShowQuizModal(false)
+            setSelectedLesson(null)
+            setRefreshTrigger(prev => prev + 1)
+          }}
+          onSaved={() => {
+            setRefreshTrigger(prev => prev + 1)
+          }}
+        />
+      )}
 
       {/* Video Editor Modal */}
       {showVideoEditor && selectedLesson && courseId && (
@@ -160,7 +212,7 @@ export const LessonList = ({
         </div>
       )}
 
-      {/* Quiz Editor Modal */}
+      {/* Legacy Quiz Editor Modal (kept for backward compatibility) */}
       {showQuizEditor && selectedLesson && courseId && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50 overflow-y-auto">
           <div className="bg-white rounded-2xl max-w-4xl w-full my-8 shadow-2xl border border-gray-100">

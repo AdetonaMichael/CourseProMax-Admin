@@ -229,6 +229,12 @@ class CourseService {
         params: { includes: includeParam },
       })
       const courseData = response.data.data.course
+      console.log('[CourseService] 🔍 FULL RESPONSE WITH LESSONS DATA:', {
+        fullResponse: response.data,
+        courseData: courseData,
+        lessonsArray: courseData.lessons,
+        firstLessonSample: courseData.lessons?.[0],
+      })
       console.log('[CourseService] Course profile received from backend:', {
         id: courseData.id,
         title: courseData.title,

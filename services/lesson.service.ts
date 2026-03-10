@@ -63,6 +63,12 @@ class LessonService {
       const response = await apiClient.get<Lesson[]>(
         `/courses/${courseId}/lessons`
       )
+      console.log('🔍 LESSON ENDPOINT RESPONSE:', {
+        endpoint: `/courses/${courseId}/lessons`,
+        fullResponse: response,
+        lessonsData: response.data,
+        firstLessonSample: response.data?.[0],
+      })
       return response.data
     } catch (error) {
       console.error('Failed to fetch lessons:', error)
@@ -76,6 +82,51 @@ class LessonService {
       return response.data
     } catch (error) {
       console.error('Failed to add video to lesson:', error)
+      throw error
+    }
+  }
+
+  async getQuizByLesson(courseId: number, lessonId: number): Promise<any> {
+    try {
+      const response = await apiClient.get(
+        `/admin/courses/${courseId}/lessons/${lessonId}/quiz`
+      )
+      console.log('📋 QUIZ FETCH:', { courseId, lessonId, quiz: response.data })
+      return response.data
+    } catch (error) {
+      console.error('Failed to fetch quiz:', error)
+      return null
+    }
+  }
+
+  async createOrUpdateQuiz(
+    courseId: number,
+    lessonId: number,
+    quizData: any,
+    isUpdate: boolean = false
+  ): Promise<any> {
+    try {
+      const endpoint = `/admin/courses/${courseId}/lessons/${lessonId}/quiz`
+      const response = isUpdate
+        ? await apiClient.put(endpoint, quizData)
+        : await apiClient.post(endpoint, quizData)
+      console.log(`✅ QUIZ ${isUpdate ? 'UPDATED' : 'CREATED'}:`, response.data)
+      return response.data
+    } catch (error) {
+      console.error(`Failed to ${isUpdate ? 'update' : 'create'} quiz:`, error)
+      throw error
+    }
+  }
+
+  async deleteQuiz(courseId: number, lessonId: number): Promise<any> {
+    try {
+      const response = await apiClient.delete(
+        `/admin/courses/${courseId}/lessons/${lessonId}/quiz`
+      )
+      console.log('🗑️ QUIZ DELETED:', response.data)
+      return response.data
+    } catch (error) {
+      console.error('Failed to delete quiz:', error)
       throw error
     }
   }
