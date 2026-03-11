@@ -5,11 +5,12 @@ import { useRouter } from 'next/navigation'
 import { useAuth } from '@/hooks/useAuth'
 import { registerSchema, type RegisterFormData } from '@/utils/validation.utils'
 import Link from 'next/link'
-import { AlertCircle, Loader2, Eye, EyeOff } from 'lucide-react'
+import { AlertCircle, Eye, EyeOff } from 'lucide-react'
+import { Button } from '@/components/shared/Button'
 
 export function RegisterForm() {
   const router = useRouter()
-  const { register, isLoading, error } = useAuth()
+  const { register, isLoading, isSubmitting, error } = useAuth()
 
   const [formData, setFormData] = useState<RegisterFormData>({
     first_name: '',
@@ -225,16 +226,15 @@ export function RegisterForm() {
         </div>
 
         {/* Submit */}
-        <button
+        <Button
           type="submit"
-          disabled={isLoading}
-          className="w-full flex items-center justify-center gap-2 text-sm font-medium text-white bg-black px-6 py-3 rounded-lg hover:opacity-80 active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100 mt-1"
+          variant="primary"
+          size="md"
+          isLoading={isSubmitting}
+          className="w-full mt-1"
         >
-          {isLoading
-            ? <><Loader2 size={15} className="animate-spin" /> Creating account...</>
-            : 'Create Account'
-          }
-        </button>
+          Create Account
+        </Button>
       </form>
 
       {/* Divider */}

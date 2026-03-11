@@ -28,7 +28,7 @@ class AuthService {
         phone_number: data.phone_number,
         password: data.password,
         password_confirmation: data.password_confirmation
-      })
+      }, { timeout: 0 })
       
       const { token, user } = response.data.data
       

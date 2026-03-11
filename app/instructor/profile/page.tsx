@@ -1,158 +1,309 @@
-'use client'
+'use client';
 
-import React, { useState } from 'react'
-import { useAuth } from '@/hooks/useAuth'
-import { InstructorLayout } from '@/components/instructor/InstructorLayout'
-import { Button } from '@/components/shared/Button'
-import { Input } from '@/components/shared/Input'
+import React, { useEffect, useState } from 'react';
+import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
+import { User, Save, AlertTriangle, CheckCircle, Loader } from 'lucide-react';
+import { InstructorLayout } from '@/components/instructor/InstructorLayout';
+import { Card, LoadingSkeleton } from '@/components/dashboard/DashboardComponents';
+import {
+  fetchInstructorProfile,
+  updateInstructorProfile,
+  fetchPayoutInfo,
+  updatePayoutInfo,
+  handleInstructorAPIError,
+  InstructorProfile,
+  PayoutInfo,
+} from '@/services/instructor.service';
 
-export default function InstructorProfilePage() {
-  const { user } = useAuth()
-  const [isEditing, setIsEditing] = useState(false)
-  const [formData, setFormData] = useState({
-    first_name: user?.first_name || '',
-    last_name: user?.last_name || '',
-    email: user?.email || '',
-    phone_number: user?.phone_number || '',
-    bio: user?.bio || '',
-  })
+export default function ProfilePage() {
+  const { status } = useSession();
+  const router = useRouter();
 
-  const [saveState, setSaveState] = useState<{ type: 'idle' | 'loading' | 'success' | 'error'; message?: string }>({
-    type: 'idle',
-  })
+  const [profile, setProfile] = useState<InstructorProfile | null>(null);
+  const [payoutInfo, setPayoutInfo] = useState<PayoutInfo | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<any>(null);
+  const [success, setSuccess] = useState<string | null>(null);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target
-    setFormData((prev) => ({ ...prev, [name]: value }))
-  }
+  const [profileForm, setProfileForm] = useState({
+    first_name: '',
+    last_name: '',
+    bio: '',
+    phone: '',
+    avatar_url: '',
+  });
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    setSaveState({ type: 'loading' })
-    try {
-      setSaveState({ type: 'success', message: 'Profile updated successfully' })
-      setIsEditing(false)
-      setTimeout(() => setSaveState({ type: 'idle' }), 3000)
-    } catch (error) {
-      setSaveState({ type: 'error', message: 'Failed to update profile' })
+  const [payoutForm, setPayoutForm] = useState({
+    bank_name: '',
+    account_number: '',
+    account_holder: '',
+    routing_number: '',
+  });
+
+  useEffect(() => {
+    if (status === 'unauthenticated') {
+      router.push('/login');
     }
+  }, [status, router]);
+
+  useEffect(() => {
+    const loadProfile = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const [profileData, payoutData] = await Promise.all([
+          fetchInstructorProfile(),
+          fetchPayoutInfo().catch(() => null),
+        ]);
+
+        setProfile(profileData);
+        setProfileForm({
+          first_name: profileData.first_name || '',
+          last_name: profileData.last_name || '',
+          bio: profileData.bio || '',
+          phone: profileData.phone || '',
+          avatar_url: profileData.avatar_url || '',
+        });
+
+        if (payoutData) {
+          setPayoutInfo(payoutData);
+          setPayoutForm({
+            bank_name: payoutData.bank_name || '',
+            account_number: payoutData.account_number || '',
+            account_holder: payoutData.account_holder || '',
+            routing_number: payoutData.routing_number || '',
+          });
+        }
+      } catch (err) {
+        console.error('Error loading profile:', err);
+        setError(handleInstructorAPIError(err));
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (status === 'authenticated') {
+      loadProfile();
+    }
+  }, [status]);
+
+  const handleSaveProfile = async () => {
+    try {
+      setSaving(true);
+      setError(null);
+      setSuccess(null);
+      const updated = await updateInstructorProfile(profileForm);
+      setProfile(updated);
+      setSuccess('Profile updated successfully!');
+      setTimeout(() => setSuccess(null), 3000);
+    } catch (err) {
+      setError(handleInstructorAPIError(err));
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleSavePayout = async () => {
+    try {
+      setSaving(true);
+      setError(null);
+      setSuccess(null);
+      const updated = await updatePayoutInfo(payoutForm);
+      setPayoutInfo(updated);
+      setSuccess('Payout information updated successfully!');
+      setTimeout(() => setSuccess(null), 3000);
+    } catch (err) {
+      setError(handleInstructorAPIError(err));
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <InstructorLayout>
+        <LoadingSkeleton count={3} />
+      </InstructorLayout>
+    );
   }
 
   return (
     <InstructorLayout>
-      <div className="max-w-2xl">
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold text-gray-900">My Profile</h1>
-          <p className="text-gray-600 mt-2">Manage your instructor information</p>
-        </div>
-
-        {saveState.type !== 'idle' && (
-          <div
-            className={`mb-6 p-4 rounded-lg ${saveState.type === 'success' ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-red-50 text-red-700 border border-red-200'}`}
-          >
-            {saveState.message}
-          </div>
-        )}
-
-        <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow p-6 space-y-6">
-          <div className="flex items-center gap-6 pb-6 border-b border-gray-200">
-            <div className="w-20 h-20 bg-green-600 rounded-full flex items-center justify-center text-white text-3xl font-bold">
-              {user?.first_name?.[0]}{user?.last_name?.[0]}
-            </div>
-            <div>
-              <h2 className="text-xl font-semibold text-gray-900">
-                {user?.first_name} {user?.last_name}
-              </h2>
-              <p className="text-gray-600">{user?.email}</p>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">First Name</label>
-              <Input
-                name="first_name"
-                value={formData.first_name}
-                onChange={handleChange}
-                disabled={!isEditing}
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Last Name</label>
-              <Input
-                name="last_name"
-                value={formData.last_name}
-                onChange={handleChange}
-                disabled={!isEditing}
-              />
-            </div>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
-            <Input
-              name="email"
-              type="email"
-              value={formData.email}
-              onChange={handleChange}
-              disabled
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Phone</label>
-            <Input
-              name="phone_number"
-              value={formData.phone_number}
-              onChange={handleChange}
-              disabled={!isEditing}
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Bio</label>
-            <textarea
-              name="bio"
-              value={formData.bio}
-              onChange={handleChange}
-              disabled={!isEditing}
-              rows={4}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-50"
-              placeholder="Tell students about yourself..."
-            />
-          </div>
-
-          <div className="flex gap-4 pt-4 border-t border-gray-200">
-            {!isEditing ? (
-              <Button onClick={() => setIsEditing(true)} variant="primary">
-                Edit Profile
-              </Button>
-            ) : (
-              <>
-                <Button type="submit" variant="primary">
-                  Save Changes
-                </Button>
-                <Button
-                  type="button"
-                  variant="secondary"
-                  onClick={() => {
-                    setIsEditing(false)
-                    setFormData({
-                      first_name: user?.first_name || '',
-                      last_name: user?.last_name || '',
-                      email: user?.email || '',
-                      phone_number: user?.phone_number || '',
-                      bio: user?.bio || '',
-                    })
-                  }}
-                >
-                  Cancel
-                </Button>
-              </>
-            )}
-          </div>
-        </form>
+      <div className="mb-6">
+        <h1 className="text-2xl font-bold text-gray-900">Profile Settings</h1>
+        <p className="text-gray-600 mt-1">Manage your instructor profile and payout information</p>
       </div>
+
+      {error && (
+        <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex gap-3">
+          <AlertTriangle className="text-red-600 flex-shrink-0" size={24} />
+          <div>
+            <h3 className="font-semibold text-red-900">{error.title}</h3>
+            <p className="text-red-800 text-sm mt-1">{error.message}</p>
+          </div>
+        </div>
+      )}
+
+      {success && (
+        <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg flex gap-3">
+          <CheckCircle className="text-green-600 flex-shrink-0" size={24} />
+          <p className="text-green-800">{success}</p>
+        </div>
+      )}
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Profile Info */}
+        <Card className="lg:col-span-2" title="Personal Information">
+          <div className="space-y-4">
+            <div className="flex items-center gap-4 pb-6 border-b">
+              <div className="w-16 h-16 rounded-full bg-gray-200 flex items-center justify-center text-2xl font-bold">
+                {profile?.first_name?.[0]}
+              </div>
+              <div>
+                <p className="font-semibold text-gray-900">{profile?.first_name} {profile?.last_name}</p>
+                <p className="text-sm text-gray-600">{profile?.email}</p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">First Name</label>
+                <input
+                  type="text"
+                  value={profileForm.first_name}
+                  onChange={(e) => setProfileForm({...profileForm, first_name: e.target.value})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Last Name</label>
+                <input
+                  type="text"
+                  value={profileForm.last_name}
+                  onChange={(e) => setProfileForm({...profileForm, last_name: e.target.value})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
+              <input
+                type="tel"
+                value={profileForm.phone}
+                onChange={(e) => setProfileForm({...profileForm, phone: e.target.value})}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Bio</label>
+              <textarea
+                value={profileForm.bio}
+                onChange={(e) => setProfileForm({...profileForm, bio: e.target.value})}
+                placeholder="Tell students about yourself..."
+                rows={4}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+              />
+            </div>
+
+            <button
+              onClick={handleSaveProfile}
+              disabled={saving}
+              className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
+            >
+              {saving ? <Loader size={20} className="animate-spin" /> : <Save size={20} />}
+              {saving ? 'Saving...' : 'Save Profile'}
+            </button>
+          </div>
+        </Card>
+
+        {/* Account Info */}
+        <Card title="Account Information">
+          <div className="space-y-3 text-sm">
+            <div>
+              <p className="text-gray-600">Email</p>
+              <p className="font-medium text-gray-900">{profile?.email}</p>
+            </div>
+            <div className
+="border-t pt-3">
+              <p className="text-gray-600">Member Since</p>
+              <p className="font-medium text-gray-900">
+                {profile?.created_at ? new Date(profile.created_at).toLocaleDateString() : 'N/A'}
+              </p>
+            </div>
+            <div className="border-t pt-3">
+              <p className="text-gray-600">Status</p>
+              <span className={`inline-block px-3 py-1 rounded-full text-xs font-medium ${
+                profile?.is_active ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+              }`}>
+                {profile?.is_active ? 'Active' : 'Inactive'}
+              </span>
+            </div>
+          </div>
+        </Card>
+      </div>
+
+      {/* Payout Information */}
+      <Card title="Payout Information" className="mt-6">
+        <div className="space-y-4">
+          {payoutInfo?.verified && (
+            <div className="p-3 bg-green-50 border border-green-200 rounded-lg text-sm text-green-800">
+              ✓ Payout information verified
+            </div>
+          )}
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Bank Name</label>
+              <input
+                type="text"
+                value={payoutForm.bank_name}
+                onChange={(e) => setPayoutForm({...payoutForm, bank_name: e.target.value})}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Account Holder</label>
+              <input
+                type="text"
+                value={payoutForm.account_holder}
+                onChange={(e) => setPayoutForm({...payoutForm, account_holder: e.target.value})}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Account Number</label>
+              <input
+                type="text"
+                value={payoutForm.account_number}
+                onChange={(e) => setPayoutForm({...payoutForm, account_number: e.target.value})}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Routing Number</label>
+              <input
+                type="text"
+                value={payoutForm.routing_number}
+                onChange={(e) => setPayoutForm({...payoutForm, routing_number: e.target.value})}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+              />
+            </div>
+          </div>
+
+          <button
+            onClick={handleSavePayout}
+            disabled={saving}
+            className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
+          >
+            {saving ? <Loader size={20} className="animate-spin" /> : <Save size={20} />}
+            {saving ? 'Saving...' : 'Save Payout Information'}
+          </button>
+        </div>
+      </Card>
     </InstructorLayout>
-  )
+  );
 }

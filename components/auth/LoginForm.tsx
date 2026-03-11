@@ -5,11 +5,12 @@ import { useRouter } from 'next/navigation'
 import { useAuth } from '@/hooks/useAuth'
 import { loginSchema, type LoginFormData } from '@/utils/validation.utils'
 import Link from 'next/link'
-import { AlertCircle, AlertTriangle, Loader2 } from 'lucide-react'
+import { AlertCircle, AlertTriangle } from 'lucide-react'
+import { Button } from '@/components/shared/Button'
 
 export function LoginForm() {
   const router = useRouter()
-  const { login, isLoading, isAuthenticated, user, fieldErrors, statusCode } = useAuth()
+  const { login, isLoading, isSubmitting, isAuthenticated, user, fieldErrors, statusCode } = useAuth()
   const [formData, setFormData] = useState<LoginFormData>({ email: '', password: '', channel: 'web' })
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [formError, setFormError] = useState<string>('')
@@ -152,16 +153,15 @@ export function LoginForm() {
         </div>
 
         {/* Submit */}
-        <button
+        <Button
           type="submit"
-          disabled={isLoading}
-          className="w-full flex items-center justify-center gap-2 text-sm font-medium text-white bg-black px-6 py-3 rounded-lg hover:opacity-80 active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100 mt-1"
+          variant="primary"
+          size="md"
+          isLoading={isSubmitting}
+          className="w-full mt-1"
         >
-          {isLoading
-            ? <><Loader2 size={15} className="animate-spin" /> Signing in...</>
-            : 'Sign In'
-          }
-        </button>
+          Sign In
+        </Button>
       </form>
 
       {/* Divider */}

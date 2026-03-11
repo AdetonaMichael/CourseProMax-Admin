@@ -394,7 +394,7 @@ export default function CourseDetailsPage({ params }: CourseDetailsPageProps) {
                       <div className="grid grid-cols-2 gap-4 mb-6">
                         <div className="bg-white border border-gray-200 rounded-lg p-4">
                           <span className="text-xs font-bold text-gray-600 uppercase tracking-wider block mb-2">Average Rating</span>
-                          <span className="text-3xl font-bold text-black">{course.reviews.average_rating.toFixed(1)} ★</span>
+                          <span className="text-3xl font-bold text-black">{((Number(course.reviews.average_rating) || 0).toFixed(1))} ★</span>
                         </div>
                         <div className="bg-white border border-gray-200 rounded-lg p-4">
                           <span className="text-xs font-bold text-gray-600 uppercase tracking-wider block mb-2">Total Reviews</span>

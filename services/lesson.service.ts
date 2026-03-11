@@ -60,7 +60,7 @@ class LessonService {
 
   async getLessonsByCourse(courseId: number): Promise<Lesson[]> {
     try {
-      const response = await apiClient.get<Lesson[]>(
+      const response = await apiClient.get<any>(
         `/courses/${courseId}/lessons`
       )
       console.log('🔍 LESSON ENDPOINT RESPONSE:', {
@@ -69,7 +69,25 @@ class LessonService {
         lessonsData: response.data,
         firstLessonSample: response.data?.[0],
       })
-      return response.data
+      
+      // Handle different response formats to ensure we always return an array
+      let lessonsArray: Lesson[] = []
+      if (Array.isArray(response.data)) {
+        lessonsArray = response.data
+      } else if (response.data?.data?.lessons && Array.isArray(response.data.data.lessons)) {
+        // Common API format: { data: { lessons: [...], total: 1 } }
+        lessonsArray = response.data.data.lessons
+      } else if (response.data?.data && Array.isArray(response.data.data)) {
+        lessonsArray = response.data.data
+      } else if (response.data?.lessons && Array.isArray(response.data.lessons)) {
+        lessonsArray = response.data.lessons
+      } else if (typeof response.data === 'object' && response.data && Object.keys(response.data).length > 0) {
+        // Last resort: if it's an object, try to find an array property
+        const firstArrayProp = Object.values(response.data).find((v) => Array.isArray(v))
+        lessonsArray = firstArrayProp ? (firstArrayProp as Lesson[]) : []
+      }
+      
+      return lessonsArray
     } catch (error) {
       console.error('Failed to fetch lessons:', error)
       throw error

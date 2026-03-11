@@ -110,7 +110,7 @@ export default function CourseTable({
                   </td>
                   <td className="col-rating">
                     <div className="rating-display">
-                      <span className="rating-value">{course.rating.toFixed(1)}</span>
+                      <span className="rating-value">{(Number(course.rating) || 0).toFixed(1)}</span>
                       <span className="rating-star">★</span>
                     </div>
                   </td>

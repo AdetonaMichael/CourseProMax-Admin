@@ -1,6 +1,7 @@
 'use client'
 
 import { useAuth } from '@/hooks/useAuth'
+import { RoleSwitcher } from '@/components/shared/RoleSwitcher'
 
 export function AdminHeader() {
   const { user } = useAuth()
@@ -22,6 +23,7 @@ export function AdminHeader() {
           </p>
         </div>
         <div className="flex items-center space-x-4">
+          <RoleSwitcher compact={true} />
           <div className="text-right">
             <p className="text-sm font-medium text-gray-900">
               {user?.first_name} {user?.last_name}

@@ -16,6 +16,7 @@ import {
   X,
   LogOut,
 } from 'lucide-react';
+import { RoleSwitcher } from '@/components/shared/RoleSwitcher';
 import './AdminLayout.css';
 
 interface AdminLayoutProps {
@@ -142,6 +143,9 @@ export function AdminLayout({ children }: AdminLayoutProps) {
           <div className="top-bar-content">
             <h2 className="top-bar-title">Admin Dashboard</h2>
             <p className="top-bar-subtitle">Welcome back, {session?.user?.email}</p>
+          </div>
+          <div className="ml-auto">
+            <RoleSwitcher compact={true} />
           </div>
         </div>
 

@@ -11,12 +11,20 @@ import {
   User,
   HelpCircle,
   LogOut,
+  Users,
+  DollarSign,
+  Settings,
+  Award,
 } from 'lucide-react'
 
 const INSTRUCTOR_MENU_ITEMS = [
   { label: 'Dashboard', href: '/instructor', icon: LayoutDashboard },
   { label: 'My Courses', href: '/instructor/courses', icon: BookOpen },
+  { label: 'Enrollments', href: '/instructor/enrollments', icon: Users },
+  { label: 'Earnings', href: '/instructor/earnings', icon: DollarSign },
+  { label: 'Certificates', href: '/instructor/certificates', icon: Award },
   { label: 'Profile', href: '/instructor/profile', icon: User },
+  { label: 'Settings', href: '/instructor/settings', icon: Settings },
   { label: 'Help', href: '/instructor/help', icon: HelpCircle },
 ]
 

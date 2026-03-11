@@ -8,7 +8,14 @@ import { authService } from '@/services/auth.service'
 import { setStoredToken } from '@/utils/storage.utils'
 import { cleanJSONResponse } from '@/lib/error-handler'
 
-function redirectByRole(role: string, router: any) {
+function redirectByRole(role: string, router: any, hasMultipleRoles: boolean = false) {
+  // If user has multiple roles, stay on a neutral page to show role switcher
+  if (hasMultipleRoles) {
+    router.push('/dashboard')
+    return
+  }
+
+  // Otherwise redirect to role-specific dashboard
   switch (role) {
     case 'admin':
       router.push('/admin')
@@ -28,12 +35,14 @@ export function useAuth() {
   const { data: session, status, update } = useSession()
   const isLoading = status === 'loading'
   const isAuthenticated = status === 'authenticated'
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const [loginError, setLoginError] = useState<string | null>(null)
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
   const [statusCode, setStatusCode] = useState<number | null>(null)
 
   const login = useCallback(
     async (email: string, password: string, channel: string = 'web') => {
+      setIsSubmitting(true)
       setLoginError(null)
       setFieldErrors({})
       setStatusCode(null)
@@ -63,6 +72,7 @@ export function useAuth() {
           setLoginError(errorMsg)
           setFieldErrors({})
           setStatusCode(result?.status || 401)
+          setIsSubmitting(false)
           throw new Error(errorMsg)
         }
 
@@ -107,14 +117,24 @@ export function useAuth() {
         setTimeout(() => {
           try {
             if (freshSessionData?.user?.roles?.length > 0) {
-              const role = freshSessionData.user.roles[0]
-              redirectByRole(role, router)
+              const roles = freshSessionData.user.roles
+              const hasMultipleRoles = roles.length > 1
+              
+              // Set initial role for role switcher
+              const initialRole = roles[0]
+              localStorage.setItem('current_role', initialRole)
+              localStorage.setItem('role_switched_at', new Date().toISOString())
+              
+              console.log('[useAuth] 🔄 Initial role set:', initialRole)
+              console.log('[useAuth] 📊 User has', roles.length, 'role(s):', roles.join(', '))
+              
+              redirectByRole(initialRole, router, hasMultipleRoles)
             } else {
-              redirectByRole('user', router)
+              redirectByRole('user', router, false)
             }
           } catch (err) {
             console.error('[useAuth] Error during redirect:', err)
-            redirectByRole('user', router)
+            redirectByRole('user', router, false)
           }
         }, 200)
       } catch (error: any) {
@@ -126,6 +146,7 @@ export function useAuth() {
         }
         
         setLoginError(errorMsg)
+        setIsSubmitting(false)
         throw new Error(errorMsg)
       }
     },
@@ -134,6 +155,7 @@ export function useAuth() {
 
   const register = useCallback(
     async (data: RegisterRequest) => {
+      setIsSubmitting(true)
       setLoginError(null)
       try {
         console.log('[useAuth] Attempting registration for:', data.email)
@@ -148,6 +170,7 @@ export function useAuth() {
         const errorMsg = error.message || 'Registration failed. Please try again.'
         console.error('[useAuth] Registration error:', errorMsg)
         setLoginError(errorMsg)
+        setIsSubmitting(false)
         throw new Error(errorMsg)
       }
     },
@@ -155,8 +178,17 @@ export function useAuth() {
   )
 
   const logout = useCallback(async () => {
-    console.log('[useAuth] Logging out...')
+    setIsSubmitting(true)
+    try {
+      // Clear role switching data before logout
+      localStorage.removeItem('current_role')
+      localStorage.removeItem('role_switched_at')
+      console.log('[useAuth] Logging out and clearing role data...')
+    } catch (error) {
+      console.error('[useAuth] Error clearing role data:', error)
+    }
     await signOut({ redirect: true, callbackUrl: '/login' })
+    setIsSubmitting(false)
   }, [])
 
   return {
@@ -164,6 +196,7 @@ export function useAuth() {
     token: session?.accessToken || null,
     isAuthenticated,
     isLoading,
+    isSubmitting,
     error: loginError,
     fieldErrors,
     statusCode,

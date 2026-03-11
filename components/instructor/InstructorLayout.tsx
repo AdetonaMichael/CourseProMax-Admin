@@ -1,6 +1,6 @@
 'use client';
 
-import React, { ReactNode } from 'react';
+import React, { ReactNode, useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { signOut, useSession } from 'next-auth/react';
@@ -11,7 +11,14 @@ import {
   DollarSign,
   User,
   Settings,
+  Menu,
+  X,
+  LogOut,
+  TrendingUp,
+  Award,
 } from 'lucide-react';
+import { RoleSwitcher } from '@/components/shared/RoleSwitcher';
+import './InstructorLayout.css';
 
 interface InstructorLayoutProps {
   children: ReactNode;
@@ -20,6 +27,21 @@ interface InstructorLayoutProps {
 export function InstructorLayout({ children }: InstructorLayoutProps) {
   const { data: session } = useSession();
   const pathname = usePathname();
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+      if (window.innerWidth >= 768) {
+        setSidebarOpen(true);
+      }
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   const menuItems = [
     { href: '/instructor', label: 'Dashboard', icon: LayoutDashboard },
@@ -35,73 +57,100 @@ export function InstructorLayout({ children }: InstructorLayoutProps) {
     return pathname.startsWith(href);
   };
 
+  const closeSidebarOnMobile = () => {
+    if (isMobile) {
+      setSidebarOpen(false);
+    }
+  };
+
   return (
-    <div className="flex h-screen bg-white">
+    <div className="flex h-screen bg-white overflow-hidden">
+      {/* Sidebar Backdrop (Mobile) */}
+      {isMobile && sidebarOpen && (
+        <div
+          className="fixed inset-0 bg-black/50 z-30"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
       {/* Sidebar */}
-      <aside className="w-64 bg-gray-900 text-gray-100 flex flex-col border-r border-gray-700">
+      <aside
+        className={`sidebar-container ${
+          sidebarOpen ? 'sidebar-open' : ''
+        }`}
+      >
         {/* Logo */}
-        <div className="p-6 border-b border-gray-700">
-          <h1 className="text-2xl font-bold text-white">CourseProMax</h1>
-          <p className="text-sm text-gray-400 mt-1">Instructor Hub</p>
+        <div className="sidebar-header">
+          <h1 className="sidebar-title">CourseProMax</h1>
+          <p className="sidebar-subtitle">Instructor Hub</p>
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
+        <nav className="sidebar-nav">
           {menuItems.map((item) => {
-            const Icon = item.icon
+            const IconComponent = item.icon;
             return (
               <Link
                 key={item.href}
                 href={item.href}
-                className={`flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${
-                  isActive(item.href)
-                    ? 'bg-white text-gray-900 font-semibold'
-                    : 'text-gray-400 hover:text-white hover:bg-gray-800'
-                }`}
+                onClick={closeSidebarOnMobile}
+                className={`sidebar-link ${isActive(item.href) ? 'active' : ''}`}
               >
-                <Icon className="w-5 h-5" />
-                <span className="text-sm">{item.label}</span>
+                <IconComponent size={20} className="sidebar-icon" />
+                <span className="sidebar-label">{item.label}</span>
               </Link>
-            )
+            );
           })}
         </nav>
 
         {/* User section */}
-        <div className="border-t border-gray-700 p-4">
-          <div className="flex items-center space-x-3 mb-4">
-            <div className="w-10 h-10 rounded-full bg-gray-600 flex items-center justify-center text-white font-semibold">
+        <div className="sidebar-footer">
+          <div className="sidebar-user">
+            <div className="user-avatar">
               {session?.user?.email?.[0].toUpperCase() || 'I'}
             </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-white truncate">
-                {session?.user?.first_name || 'Instructor'}
-              </p>
-              <p className="text-xs text-gray-400">Instructor</p>
+            <div className="user-info">
+              <p className="user-email">{session?.user?.first_name || 'Instructor'}</p>
+              <p className="user-role">Instructor</p>
             </div>
           </div>
           <button
             onClick={() => signOut({ callbackUrl: '/login' })}
-            className="w-full px-4 py-2 text-sm text-gray-300 hover:text-white hover:bg-gray-800 rounded-lg transition-colors"
+            className="sidebar-logout-btn"
+            title="Logout"
           >
-            Sign Out
+            <LogOut size={18} />
+            <span>Logout</span>
           </button>
         </div>
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 flex flex-col overflow-hidden">
+      <main className="main-content">
         {/* Top Bar */}
-        <div className="bg-white border-b border-gray-200 px-8 py-4 flex items-center justify-between">
-          <div>
-            <h2 className="text-2xl font-bold text-gray-900">Instructor Dashboard</h2>
-            <p className="text-sm text-gray-500 mt-1">Manage your courses and students</p>
+        <div className="top-bar">
+          <button
+            className="toggle-sidebar-btn"
+            onClick={() => setSidebarOpen(!sidebarOpen)}
+            aria-label="Toggle sidebar"
+          >
+            {sidebarOpen ? (
+              <X size={24} />
+            ) : (
+              <Menu size={24} />
+            )}
+          </button>
+          <div className="top-bar-content">
+            <h2 className="top-bar-title">Instructor Dashboard</h2>
+            <p className="top-bar-subtitle">Welcome back, {session?.user?.first_name || 'Instructor'}</p>
+          </div>
+          <div className="ml-auto">
+            <RoleSwitcher compact={true} />
           </div>
         </div>
 
         {/* Content */}
-        <div className="flex-1 overflow-auto bg-gray-50">
-          <div className="p-8">{children}</div>
-        </div>
+        <div className="main-content-area">{children}</div>
       </main>
     </div>
   );

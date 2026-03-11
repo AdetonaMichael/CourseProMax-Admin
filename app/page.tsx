@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { ArrowRight, TrendingUp, BookOpen, Users, Award, Brain, Play, BarChart2, Star, Layers } from 'lucide-react'
+import { ArrowRight, TrendingUp, BookOpen, Users, Award, Brain, Play, BarChart2, Star, Layers, Apple, Download } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 
 // ─── Hooks ────────────────────────────────────────────────────────────────────
@@ -37,11 +37,11 @@ function StatCard({ value, suffix, label, delay }: { value: number; suffix: stri
   const { ref, inView } = useInView()
   const count = useCounter(value, 2000, inView)
   return (
-    <div ref={ref} className="text-center px-6 border-r border-gray-200 last:border-r-0" style={{ animationDelay: `${delay}ms` }}>
-      <div style={{ fontFamily: "'Syne', sans-serif" }} className="text-5xl font-black text-black tracking-tight leading-none">
+    <div ref={ref} className="text-center px-4 sm:px-8 lg:px-6 py-6 sm:py-16 lg:py-20 border-b sm:border-b-0 sm:border-r border-gray-200 sm:last:border-r-0 last:border-b-0 min-h-[120px] sm:min-h-[220px] flex flex-col items-center justify-center" style={{ animationDelay: `${delay}ms` }}>
+      <div style={{ fontFamily: "'Syne', sans-serif", fontSize: 'clamp(1.5rem, 4.5vw, 2.8rem)' }} className="font-black text-black tracking-tight leading-tight break-words">
         {count.toLocaleString()}{suffix}
       </div>
-      <p className="text-sm text-gray-500 mt-2">{label}</p>
+      <p className="text-xs sm:text-sm lg:text-base text-gray-500 mt-3 sm:mt-5 font-medium leading-snug max-w-[90%] sm:max-w-full">{label}</p>
     </div>
   )
 }
@@ -269,8 +269,8 @@ export default function Home() {
         </section>
 
         {/* ── STATS ── */}
-        <section className="py-20 px-6 bg-gray-50 border-t border-b border-gray-200">
-          <div className="max-w-5xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-y-10 gap-x-0">
+        <section className="py-16 sm:py-24 lg:py-32 px-0 sm:px-0 bg-gray-50 border-t border-b border-gray-200">
+          <div className="w-full grid grid-cols-2 sm:grid-cols-4 gap-0">
             <StatCard value={50000} suffix="+" label="Active Learners" delay={0} />
             <StatCard value={2000}  suffix="+" label="Courses Published" delay={100} />
             <StatCard value={99}    suffix="%" label="Uptime SLA" delay={200} />
@@ -349,48 +349,154 @@ export default function Home() {
         </section>
 
         {/* ── AI SECTION ── */}
-        <section className="py-24 px-6 bg-black" id="ai-engine">
-          <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-16 items-start">
+        <section className="py-16 sm:py-24 lg:py-32 px-4 sm:px-6 bg-black" id="ai-engine">
+          <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 sm:gap-12 lg:gap-16 items-start">
 
             {/* Left — text */}
             <div className="flex flex-col">
-              <p className="text-xs font-semibold tracking-widest uppercase text-neutral-600 mb-4">AI Engine</p>
+              <p className="text-xs font-semibold tracking-widest uppercase text-neutral-600 mb-3 sm:mb-4">AI Engine</p>
               <h2
-                className="font-black text-white leading-none tracking-tighter mb-5"
-                style={{ ...syne, fontSize: 'clamp(32px, 4vw, 52px)' }}
+                className="font-black text-white leading-snug tracking-tight mb-4 sm:mb-5 max-w-sm"
+                style={{ ...syne, fontSize: 'clamp(24px, 4.5vw, 36px)' }}
               >
                 Recommendations<br />
-                <span className="text-neutral-600">that actually work.</span>
+                <span className="text-neutral-500">that actually work.</span>
               </h2>
-              <p className="text-base text-neutral-500 font-light leading-relaxed mb-10 max-w-sm">
+              <p className="text-sm sm:text-base text-neutral-400 font-light leading-relaxed mb-8 sm:mb-10 max-w-sm">
                 Our engine analyses behaviour across the platform and surfaces content gaps your courses can fill — before your competitors do.
               </p>
               <a
                 href="/register"
-                className="inline-flex items-center gap-2 text-sm font-medium text-black bg-white px-6 py-3 rounded-lg hover:opacity-90 transition-opacity no-underline w-fit"
+                className="inline-flex items-center gap-2 text-xs sm:text-sm font-medium text-black bg-white px-5 sm:px-6 py-2.5 sm:py-3 rounded-lg hover:opacity-90 active:scale-95 transition-all duration-150 no-underline w-fit"
               >
                 Try it free <ArrowRight size={15} />
               </a>
             </div>
 
             {/* Right — cards */}
-            <div className="flex flex-col gap-3">
+            <div className="flex flex-col gap-4 sm:gap-3">
               {[
                 { icon: Brain,      title: 'Demand Forecasting',   desc: 'AI predicts which topics will trend in your niche over the next 90 days.' },
                 { icon: Star,       title: 'Content Gap Analysis', desc: "Identify what your students search for but can't find in your catalogue." },
                 { icon: Users,      title: 'Personalised Paths',   desc: 'Each student gets a custom learning path built from their goals and history.' },
                 { icon: TrendingUp, title: 'Revenue Optimisation', desc: 'Smart pricing suggestions based on demand, competition, and your audience.' },
               ].map((c, i) => (
-                <div key={i} className="flex items-start gap-4 bg-neutral-900 border border-neutral-800 rounded-xl p-5 hover:border-neutral-700 transition-colors">
-                  <div className="w-8 h-8 rounded-md bg-neutral-800 flex items-center justify-center text-neutral-400 shrink-0 mt-0.5">
-                    <c.icon size={15} />
+                <div key={i} className="flex items-start gap-3 sm:gap-4 bg-neutral-900 border border-neutral-800 rounded-lg sm:rounded-xl p-4 sm:p-5 hover:border-neutral-700 transition-colors">
+                  <div className="w-7 sm:w-8 h-7 sm:h-8 rounded-md bg-neutral-800 flex items-center justify-center text-neutral-400 shrink-0 mt-0.5">
+                    <c.icon size={14} className="sm:w-4 sm:h-4" />
                   </div>
-                  <div className="min-w-0">
-                    <p className="text-sm font-medium text-neutral-200 mb-1">{c.title}</p>
-                    <p className="text-sm text-neutral-500 leading-relaxed font-light">{c.desc}</p>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-xs sm:text-sm font-semibold text-neutral-100 mb-1.5">{c.title}</p>
+                    <p className="text-xs sm:text-sm text-neutral-400 leading-relaxed font-light">{c.desc}</p>
                   </div>
                 </div>
               ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ── MOBILE APP MOCK ── */}
+        <section className="py-24 px-6 bg-white border-t border-gray-200" id="mobile-app">
+          <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-12 lg:gap-20 items-center">
+            
+            {/* Left — App Store Downloads */}
+            <div className="flex flex-col">
+              <p className="text-xs font-semibold tracking-widest uppercase text-gray-400 mb-4">Mobile Learning</p>
+              <h2
+                className="font-black text-black leading-none tracking-tighter mb-5"
+                style={{ ...syne, fontSize: 'clamp(32px, 4vw, 52px)' }}
+              >
+                Learn on<br />
+                <span className="text-gray-300">the go.</span>
+              </h2>
+              <p className="text-base text-gray-500 font-light leading-relaxed mb-10 max-w-sm">
+                Access your courses, track your progress, and continue learning anytime, anywhere with our native mobile apps for iOS and Android.
+              </p>
+              
+              {/* App Store Badges */}
+              <div className="flex flex-col sm:flex-row gap-3 gap-y-4 sm:gap-3 mb-8 w-full">
+                {/* App Store */}
+                <a 
+                  href="https://apps.apple.com/app/coursepromax" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-3 bg-black text-white px-5 py-3 rounded-xl hover:bg-gray-900 active:scale-95 transition-all duration-150 no-underline group border border-gray-800 flex-1"
+                >
+                  <Apple size={20} className="shrink-0" />
+                  <div className="flex flex-col leading-tight">
+                    <span className="text-xs text-gray-400 font-medium">Download on</span>
+                    <span className="text-sm font-semibold tracking-tight">App Store</span>
+                  </div>
+                </a>
+                
+                {/* Play Store */}
+                <a 
+                  href="https://play.google.com/store/apps/details?id=com.coursepromax" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-3 bg-black text-white px-5 py-3 rounded-xl hover:bg-gray-900 active:scale-95 transition-all duration-150 no-underline group border border-gray-800 flex-1"
+                >
+                  <Play size={20} className="shrink-0" />
+                  <div className="flex flex-col leading-tight">
+                    <span className="text-xs text-gray-400 font-medium">Get it on</span>
+                    <span className="text-sm font-semibold tracking-tight">Google Play</span>
+                  </div>
+                </a>
+              </div>
+
+              {/* Download Button */}
+              <div className="flex flex-col gap-2">
+                <button 
+                  onClick={() => {
+                    // Direct download fallback
+                    window.open('https://coursepromax.app/download', '_blank')
+                  }}
+                  className="inline-flex items-center justify-center gap-2 text-sm font-medium text-black border-2 border-black bg-white px-8 py-4 rounded-lg hover:bg-black hover:text-white transition-all duration-200 active:scale-95 w-full sm:w-auto"
+                >
+                  <Download size={16} className="shrink-0" />
+                  <span>Direct Download</span>
+                </button>
+                <p className="text-xs text-gray-500 text-center sm:text-left">Available for iOS 13+ and Android 9+</p>
+              </div>
+            </div>
+
+            {/* Right — Phone Mockup */}
+            <div className="relative flex justify-center items-center md:justify-end">
+              <div 
+                className="w-full max-w-sm relative"
+                style={{
+                  animation: 'fadeSlideUp 0.8s ease both'
+                }}
+              >
+                {/* Phone frame shadow and styling */}
+                <div className="absolute inset-0 bg-gradient-to-br from-gray-900/20 to-black/20 rounded-3xl blur-2xl transform scale-105 -z-10" />
+                
+                {/* Phone frame */}
+                <div className="bg-black rounded-3xl overflow-hidden shadow-2xl border-8 border-gray-900 aspect-[9/18.5]">
+                  {/* Status bar */}
+                  <div className="bg-black h-8 flex items-center justify-between px-6 text-white text-xs">
+                    <span>9:41</span>
+                    <div className="flex items-center gap-1">
+                      <div className="w-4 h-2.5 border border-white rounded-sm" />
+                      <div className="w-1 h-1 bg-white rounded-full" />
+                    </div>
+                  </div>
+
+                  {/* Screen content */}
+                  <div className="bg-white flex-1 overflow-hidden flex items-center justify-center">
+                    <img 
+                      src="/course6.png" 
+                      alt="CourseProMax Mobile App"
+                      className="w-full h-full object-contain"
+                    />
+                  </div>
+
+                  {/* Home indicator */}
+                  <div className="bg-black h-6 flex items-end justify-center pb-1">
+                    <div className="w-32 h-1 bg-white rounded-full" />
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </section>
@@ -455,6 +561,9 @@ export default function Home() {
                   <a key={l} href="#" className="text-xs text-neutral-600 hover:text-neutral-400 transition-colors no-underline">{l}</a>
                 ))}
               </div>
+            </div>
+            <div className="flex justify-center items-center mt-6 pt-6 border-t border-neutral-900">
+              <p className="text-xs text-neutral-700">Powered by <span className="text-neutral-500 font-semibold">Remonode</span></p>
             </div>
           </div>
         </footer>

@@ -340,7 +340,7 @@ export default function AdminDashboard() {
               {
                 key: 'rating',
                 label: 'Rating',
-                render: (rating) => `${rating.toFixed(1)} ⭐`,
+                render: (rating) => `${(Number(rating) || 0).toFixed(1)} ⭐`,
               },
             ]}
             data={courses}
