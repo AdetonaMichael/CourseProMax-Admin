@@ -1,24 +1,48 @@
 'use client'
 
-import { useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import { useEffect, useState } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { useSession } from 'next-auth/react'
 import { LoginForm } from '@/components/auth/LoginForm'
+import { Metadata } from 'next'
+
+
+export const metadata:Metadata = {
+  'title':'CourseProMax Login',
+  'description': 'Publish Your Education Contents and Start Earning with CourseProMax'
+}
 
 export default function LoginPage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const { data: session, status } = useSession()
+  const [sessionError, setSessionError] = useState<string>('')
 
+  // Extract error from URL
+  useEffect(() => {
+    const error = searchParams.get('error')
+    if (error === 'session_expired') {
+      setSessionError('Your session has expired. Please log in again.')
+    }
+  }, [searchParams])
+
+  // Redirect authenticated users to their dashboard
   useEffect(() => {
     if (status === 'authenticated' && session?.user) {
-      const role = session.user.roles?.[0] || 'user'
-      switch (role) {
-        case 'admin':      router.replace('/admin');      break
-        case 'instructor': router.replace('/instructor'); break
-        default:           router.replace('/dashboard')
+      const userRole = session.user.roles?.[0]
+      
+      switch (userRole) {
+        case 'admin':
+          router.replace('/admin')
+          break
+        case 'instructor':
+          router.replace('/instructor')
+          break
+        default:
+          router.replace('/dashboard')
       }
     }
-  }, [status, session, router])
+  }, [status, session?.user, router])
 
   if (status === 'loading') {
     return (
@@ -101,7 +125,7 @@ export default function LoginPage() {
 
             {/* Form card */}
             <div className="anim-fade-up anim-delay-1 bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
-              <LoginForm />
+              <LoginForm sessionError={sessionError} />
             </div>
 
             {/* Footer note */}
@@ -117,5 +141,12 @@ export default function LoginPage() {
     )
   }
 
-  return null
+  return (
+    <div className="min-h-screen bg-white flex items-center justify-center">
+      <div className="flex flex-col items-center gap-4">
+        <div className="w-8 h-8 border-2 border-gray-200 border-t-black rounded-full animate-spin" />
+        <p className="text-sm text-gray-400 tracking-widest uppercase">Redirecting...</p>
+      </div>
+    </div>
+  )
 }

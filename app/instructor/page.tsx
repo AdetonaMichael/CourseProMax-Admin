@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { useSession } from 'next-auth/react';
+import { useSession, signOut } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { BookOpen, Users, CheckCircle, Star, AlertTriangle, TrendingUp, DollarSign, Activity } from 'lucide-react';
 import { InstructorLayout } from '@/components/instructor/InstructorLayout';
@@ -28,19 +28,37 @@ export default function InstructorDashboard() {
   const [revenueData, setRevenueData] = useState<RevenueAnalytics | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<any>(null);
+  const [authError, setAuthError] = useState(false);
 
-  // Check authorization
+  // Check authorization - redirect if not instructor
   useEffect(() => {
-    if (status === 'unauthenticated') {
-      router.push('/login');
-    } else if (status === 'authenticated' && !session?.user?.roles?.includes('instructor')) {
-      router.push('/admin');
+    if (status === 'loading') {
+      return;
     }
-  }, [status, session, router]);
 
-  // Fetch comprehensive dashboard data
+    if (status === 'unauthenticated') {
+      router.push('/login?error=session_expired');
+      return;
+    }
+
+    if (status === 'authenticated' && session?.user) {
+      const isInstructor = session.user.roles?.includes('instructor');
+      if (!isInstructor) {
+        router.push('/dashboard');
+        return;
+      }
+    }
+  }, [status, session?.user?.roles, router]);
+
+  // Fetch comprehensive dashboard data with proper error handling
   useEffect(() => {
     const loadDashboardData = async () => {
+      // Prevent loading if already has auth error to avoid infinite loops
+      if (authError) {
+        console.log('[Instructor Dashboard] Auth error flag set, skipping data load');
+        return;
+      }
+
       try {
         setLoading(true);
         setError(null);
@@ -48,20 +66,33 @@ export default function InstructorDashboard() {
         console.log('[Instructor Dashboard] Loading comprehensive data...');
         const [overview, coursesData, revenueAnalytics] = await Promise.all([
           fetchDashboardOverview().catch((err) => {
+            // Check for 401 errors specifically - these indicate session is invalid
+            if (err?.status === 401 || err?.response?.status === 401) {
+              console.error('[Dashboard] Received 401 Unauthorized - triggering logout');
+              throw new Error('SESSION_EXPIRED');
+            }
             console.warn('[Dashboard] Overview fetch failed, continuing:', err);
             return null;
           }),
           fetchInstructorCourses(1).catch((err) => {
+            if (err?.status === 401 || err?.response?.status === 401) {
+              console.error('[Dashboard] Received 401 Unauthorized - triggering logout');
+              throw new Error('SESSION_EXPIRED');
+            }
             console.warn('[Dashboard] Courses fetch failed, continuing:', err);
             return null;
           }),
           fetchRevenueAnalytics().catch((err) => {
+            if (err?.status === 401 || err?.response?.status === 401) {
+              console.error('[Dashboard] Received 401 Unauthorized - triggering logout');
+              throw new Error('SESSION_EXPIRED');
+            }
             console.warn('[Dashboard] Revenue fetch failed, continuing:', err);
             return null;
           }),
         ]);
 
-        console.log('[Instructor Dashboard] Data loaded:', {
+        console.log('[Instructor Dashboard] Data loaded successfully:', {
           hasOverview: !!overview,
           coursesCount: coursesData?.courses?.length || 0,
           hasRevenue: !!revenueAnalytics,
@@ -73,25 +104,57 @@ export default function InstructorDashboard() {
 
         // Fetch students from first course if available
         if (coursesData?.courses?.[0]) {
-          const studentsData = await fetchCourseStudents(coursesData.courses[0].id).catch(() => null);
+          const studentsData = await fetchCourseStudents(coursesData.courses[0].id).catch((err) => {
+            if (err?.status === 401 || err?.response?.status === 401) {
+              console.error('[Dashboard] Received 401 Unauthorized in student fetch - triggering logout');
+              throw new Error('SESSION_EXPIRED');
+            }
+            return null;
+          });
           if (studentsData) {
             setCourseStudents(studentsData.students || []);
           }
         }
-      } catch (err) {
+      } catch (err: any) {
         console.error('[Instructor Dashboard] Error:', err);
+        
+        // Handle session expiration
+        if (err?.message === 'SESSION_EXPIRED' || err?.status === 401) {
+          console.error('[Instructor Dashboard] Session expired, signing out...');
+          setAuthError(true);
+          // Sign out and redirect
+          await signOut({
+            redirect: false,
+          });
+          router.push('/login?error=session_expired');
+          return;
+        }
+
         setError(handleInstructorAPIError(err));
       } finally {
         setLoading(false);
       }
     };
 
-    if (status === 'authenticated') {
+    if (status === 'authenticated' && !authError) {
       loadDashboardData();
     }
-  }, [status]);
+  }, [status, authError, router]);
 
-  if (status === 'loading' || loading) {
+  if (status === 'loading') {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
+
+  // Don't render content if not authenticated or not instructor (middleware will redirect)
+  if (!session?.user?.id || !session?.user?.email || !session.user.roles?.includes('instructor')) {
+    return null;
+  }
+
+  if (loading) {
     return (
       <InstructorLayout>
         <LoadingSkeleton count={6} />

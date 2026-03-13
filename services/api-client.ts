@@ -77,29 +77,46 @@ class ApiClient {
     this.client.interceptors.response.use(
       (response) => {
         console.debug('[API Client] Success response:', response.config.url, response.status)
-        return response
+        return response as any
       },
       (error: AxiosError<any>) => {
+        const statusCode = error.response?.status || 0
+        
         console.error('[API Client] Response error:', {
           url: error.config?.url,
-          status: error.response?.status,
+          status: statusCode,
           data: error.response?.data,
         })
 
-        // Handle unauthorized errors
-        if (error.response?.status === 401) {
-          console.warn('[API Client] Unauthorized - clearing auth storage')
+        // Handle unauthorized errors - trigger sign-out (non-blocking)
+        if (statusCode === 401 || statusCode === 403) {
+          console.warn('[API Client] Unauthorized (401/403) - initiating logout')
           clearAuthStorage()
+          
+          // Non-blocking sign-out attempt
+          Promise.resolve().then(async () => {
+            try {
+              // Dynamic import to avoid server-side issues
+              const { handleAuthenticationError } = await import('@/lib/auth-error-handler')
+              await handleAuthenticationError(statusCode, 'Session expired or invalid')
+            } catch (signOutErr) {
+              console.error('[API Client] Failed to sign out:', signOutErr)
+              // Fallback: redirect manually
+              if (typeof window !== 'undefined') {
+                window.location.href = '/login?error=session_expired'
+              }
+            }
+          })
         }
 
         // Format error response
         const apiError: ApiError = {
           message: error.response?.data?.message || error.message || 'An error occurred',
-          status: error.response?.status || 0,
+          status: statusCode,
           errors: error.response?.data?.errors || error.response?.data?.data?.errors,
         }
 
-        return Promise.reject(apiError)
+        return Promise.reject(apiError) as any
       }
     )
   }

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { useSession } from 'next-auth/react';
+import { useSession, signOut } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { AdminLayout } from '@/components/admin/AdminLayout';
 import { StatCard, DataTable, Card, LoadingSkeleton, EmptyState } from '@/components/dashboard/DashboardComponents';
@@ -27,18 +27,49 @@ export default function AdminDashboard() {
   const [enrollments, setEnrollments] = useState<Enrollment[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<any>(null);
+  const [authError, setAuthError] = useState(false);
 
-  // Check authorization
+  // Check authorization - redirect if not admin
   useEffect(() => {
-    if (status === 'unauthenticated') {
-      router.push('/login');
-    } else if (status === 'authenticated' && !session?.user?.roles?.includes('admin')) {
-      router.push('/instructor');
+    if (status === 'loading') {
+      return
     }
-  }, [status, session, router]);
 
-  // Fetch dashboard data
+    if (status === 'unauthenticated') {
+      router.push('/login?error=session_expired')
+      return
+    }
+
+    if (status === 'authenticated' && session?.user) {
+      const isAdmin = session.user.roles?.includes('admin')
+      if (!isAdmin) {
+        router.push('/dashboard')
+        return
+      }
+    }
+  }, [status, session?.user?.roles, router])
+
+  // Show loading state while auth is being checked
+  if (status === 'loading') {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      </div>
+    )
+  }
+
+  // Don't render content if not authenticated or not admin (middleware will redirect)
+  if (!session?.user?.id || !session?.user?.email || !session.user.roles?.includes('admin')) {
+    return null
+  }
+
+  // Fetch dashboard data with proper error handling
   useEffect(() => {
+    // Prevent loading if already has auth error
+    if (authError) {
+      return;
+    }
+
     const loadDashboardData = async () => {
       try {
         setLoading(true);
@@ -47,12 +78,30 @@ export default function AdminDashboard() {
         console.log('[Admin Dashboard] Loading data...');
         const [statsData, usersData, coursesData, enrollmentsData] = await Promise.all([
           fetchEnrollmentStats().catch((err) => {
+            if (err?.status === 401 || err?.response?.status === 401) {
+              throw new Error('SESSION_EXPIRED');
+            }
             console.error('[Admin Dashboard] Stats error:', err);
             return null;
           }),
-          fetchUsers(1, { per_page: 10 }),
-          fetchCourses(1, { per_page: 10 }),
-          fetchEnrollments(1, { per_page: 10 }),
+          fetchUsers(1, { per_page: 10 }).catch((err) => {
+            if (err?.status === 401 || err?.response?.status === 401) {
+              throw new Error('SESSION_EXPIRED');
+            }
+            return null;
+          }),
+          fetchCourses(1, { per_page: 10 }).catch((err) => {
+            if (err?.status === 401 || err?.response?.status === 401) {
+              throw new Error('SESSION_EXPIRED');
+            }
+            return null;
+          }),
+          fetchEnrollments(1, { per_page: 10 }).catch((err) => {
+            if (err?.status === 401 || err?.response?.status === 401) {
+              throw new Error('SESSION_EXPIRED');
+            }
+            return null;
+          }),
         ]);
 
         console.log('[Admin Dashboard] Data loaded:', {
@@ -66,20 +115,33 @@ export default function AdminDashboard() {
         setUsers(usersData?.users || []);
         setCourses(coursesData?.courses || []);
         setEnrollments(enrollmentsData?.enrollments || []);
-      } catch (err) {
+      } catch (err: any) {
         console.error('[Admin Dashboard] Error:', err);
+        
+        // Handle session expiration
+        if (err?.message === 'SESSION_EXPIRED' || err?.status === 401) {
+          console.error('[Admin Dashboard] Session expired, signing out...');
+          setAuthError(true);
+          // Sign out and redirect
+          await signOut({
+            redirect: false,
+          });
+          router.push('/login?error=session_expired');
+          return;
+        }
+
         setError(handleAPIError(err));
       } finally {
         setLoading(false);
       }
     };
 
-    if (status === 'authenticated') {
+    if (status === 'authenticated' && !authError) {
       loadDashboardData();
     }
-  }, [status]);
+  }, [status, authError, router]);
 
-  if (status === 'loading' || loading) {
+  if (loading) {
     return (
       <AdminLayout>
         <LoadingSkeleton count={4} />

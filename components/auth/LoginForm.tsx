@@ -1,31 +1,18 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import { useState } from 'react'
 import { useAuth } from '@/hooks/useAuth'
 import { loginSchema, type LoginFormData } from '@/utils/validation.utils'
 import Link from 'next/link'
 import { AlertCircle, AlertTriangle } from 'lucide-react'
 import { Button } from '@/components/shared/Button'
 
-export function LoginForm() {
-  const router = useRouter()
-  const { login, isLoading, isSubmitting, isAuthenticated, user, fieldErrors, statusCode } = useAuth()
+export function LoginForm({ sessionError = '' }: { sessionError?: string }) {
+  const { login, isSubmitting, fieldErrors, statusCode, error: loginHookError } = useAuth()
   const [formData, setFormData] = useState<LoginFormData>({ email: '', password: '', channel: 'web' })
   const [errors, setErrors] = useState<Record<string, string>>({})
-  const [formError, setFormError] = useState<string>('')
+  const [formError, setFormError] = useState<string>(sessionError || loginHookError || '')
   const [showPass, setShowPass] = useState(false)
-
-  useEffect(() => {
-    if (isAuthenticated && user) {
-      const role = user.roles?.[0] || 'user'
-      switch (role) {
-        case 'admin':      router.replace('/admin');      break
-        case 'instructor': router.replace('/instructor'); break
-        default:           router.replace('/dashboard')
-      }
-    }
-  }, [isAuthenticated, user, router])
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
@@ -49,6 +36,7 @@ export function LoginForm() {
 
     try {
       await login(formData.email, formData.password, 'web')
+      // Login successful - useAuth hook handles redirect via parent component
     } catch (err: any) {
       const errorMessage = err.message || 'An error occurred during login. Please try again.'
       setFormError(errorMessage)

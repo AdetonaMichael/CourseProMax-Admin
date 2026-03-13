@@ -36,7 +36,16 @@ export function getStoredToken(): string | null {
 export function clearAuthStorage(): void {
   try {
     if (typeof window !== 'undefined') {
+      // Remove all auth-related keys
       localStorage.removeItem(TOKEN_KEY)
+      localStorage.removeItem('auth_token')
+      localStorage.removeItem('current_role')
+      localStorage.removeItem('role_switched_at')
+      
+      // Also clear any session-related data
+      sessionStorage.clear()
+      
+      console.debug('[Storage] ✅ All auth credentials cleared from storage')
     }
   } catch (error) {
     console.error('[Storage] Failed to clear storage:', error)

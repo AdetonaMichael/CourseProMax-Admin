@@ -4,7 +4,7 @@ import React, { useState } from 'react'
 import { X, AlertCircle, Loader2, Clock, BarChart2, Eye, Info } from 'lucide-react'
 import { createLesson, handleInstructorAPIError } from '@/services/instructor.service'
 import { useNotification } from '@/hooks/useNotification'
-import { LessonType } from '@/types/course.types'
+import { LessonType, Lesson } from '@/types/course.types'
 
 interface InlineLessonEditorProps {
   courseId: number
@@ -47,13 +47,13 @@ export const InlineLessonEditor: React.FC<InlineLessonEditorProps> = ({ courseId
 
     try {
       setSaving(true)
-      const lessonData = {
+      const lessonData: Partial<Lesson> = {
         title: title.trim(),
         description: description.trim(),
-        type: type as LessonType,
+        type: type as "video" | "reading" | "quiz" | "assignment" | "interactive" | "mixed" | "resource",
         order: order,
         estimated_duration_minutes: estimatedDuration,
-        difficulty: difficulty as any,
+        difficulty: difficulty as "beginner" | "intermediate" | "advanced",
         is_preview: isPreview,
         is_active: true,
       }

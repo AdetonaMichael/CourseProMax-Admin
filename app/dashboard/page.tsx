@@ -3,80 +3,90 @@
 import React, { useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import { useRoleSwitch } from '@/hooks/useRoleSwitch';
 
 export default function DashboardPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
-  const { hasMultipleRoles, availableRoles } = useRoleSwitch();
 
   useEffect(() => {
+    if (status === 'loading') {
+      return;
+    }
+
     if (status === 'unauthenticated') {
       router.push('/login');
       return;
     }
 
-    if (status === 'authenticated') {
-      // If user has multiple roles, show a role selector page
-      if (hasMultipleRoles) {
-        // Stay on this page and show role switcher from header
+    if (status === 'authenticated' && session?.user) {
+      const userRoles = session.user.roles || [];
+      
+      // Single role users: redirect to their dashboard
+      if (userRoles.length === 1) {
+        const role = userRoles[0];
+        if (role === 'admin') {
+          router.push('/admin');
+        } else if (role === 'instructor') {
+          router.push('/instructor');
+        }
         return;
       }
 
-      // Single role user - redirect to their dashboard
-      const userRole = session?.user?.roles?.[0];
-      console.log('[Dashboard] User role:', userRole);
-
-      if (userRole === 'admin') {
-        router.push('/admin');
-      } else if (userRole === 'instructor') {
-        router.push('/instructor');
-      } else {
-        // Fallback to admin if role doesn't match
-        router.push('/admin');
-      }
+      // Multi-role users: stay on dashboard and show role selector
+      // (will render below)
     }
-  }, [status, router, session, hasMultipleRoles]);
+  }, [status, session?.user, router]);
 
-  // Show role selector for multi-role users
-  if (hasMultipleRoles) {
+  if (status === 'loading') {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
+
+  // Don't render if not authenticated (middleware will redirect)
+  if (status === 'unauthenticated') {
+    return null;
+  }
+
+  // If not a valid authenticated session (no user ID or email), return null
+  if (!session?.user?.id || !session?.user?.email) {
+    return null;
+  }
+
+  // Multi-role users get role selector
+  const userRoles = session?.user?.roles || [];
+  if (userRoles.length > 1) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center p-4">
         <div className="text-center max-w-md">
           <h1 className="text-3xl font-bold text-gray-900 mb-4">Select Your Dashboard</h1>
           <p className="text-gray-600 mb-8">
             You have access to multiple dashboards. Choose which one you'd like to access:
           </p>
           <div className="space-y-3">
-            {availableRoles.map((role) => (
+            {userRoles.includes('admin') && (
               <button
-                key={role}
-                onClick={() => {
-                  const dashboardMap: Record<string, string> = {
-                    admin: '/admin',
-                    instructor: '/instructor',
-                    student: '/dashboard',
-                    user: '/dashboard',
-                  };
-                  router.push(dashboardMap[role] || '/dashboard');
-                }}
-                className={`w-full py-3 px-4 rounded-lg font-medium transition-colors ${
-                  role === 'admin'
-                    ? 'bg-red-100 text-red-900 hover:bg-red-200'
-                    : role === 'instructor'
-                    ? 'bg-blue-100 text-blue-900 hover:bg-blue-200'
-                    : 'bg-gray-100 text-gray-900 hover:bg-gray-200'
-                }`}
+                onClick={() => router.push('/admin')}
+                className="w-full px-6 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition"
               >
-                {role.charAt(0).toUpperCase() + role.slice(1)} Dashboard
+                Admin Dashboard
               </button>
-            ))}
+            )}
+            {userRoles.includes('instructor') && (
+              <button
+                onClick={() => router.push('/instructor')}
+                className="w-full px-6 py-3 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 transition"
+              >
+                Instructor Dashboard
+              </button>
+            )}
           </div>
         </div>
       </div>
     );
   }
 
-  // Return null during redirect for single-role users
   return null;
 }

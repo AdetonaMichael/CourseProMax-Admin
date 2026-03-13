@@ -1,25 +1,27 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { ToastContainer } from "@/components/shared/Toast";
 import { AlertContainer } from "@/components/shared/AlertContainer";
 import { ConfirmationDialogProvider } from "@/components/shared/ConfirmationDialog";
 import { PromptDialogProvider } from "@/components/shared/PromptDialog";
 import { AuthProvider } from "@/components/auth/AuthProvider";
+import { SessionErrorBoundary } from "@/components/auth/SessionErrorBoundary";
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+};
 
 export const metadata: Metadata = {
   title: "CourseProMax - The Future of Course Management",
   description: "Enterprise-grade course management platform. Secure, elegant, powerful. The epitome of educational platform excellence.",
   keywords: ["course management", "LMS", "learning management system", "education platform", "online courses", "course hosting"],
   authors: [{ name: "CourseProMax Team" }],
-  creator: "CourseProMax",
-  publisher: "CourseProMax",
+  creator: "Remonode",
+  publisher: "Remonode",
   icons: {
     icon: '/icon.png',
-  },
-  viewport: {
-    width: "device-width",
-    initialScale: 1,
-    maximumScale: 1,
   },
   robots: {
     index: true,
@@ -91,7 +93,9 @@ export default function RootLayout({
         <ConfirmationDialogProvider>
           <PromptDialogProvider>
             <AuthProvider>
-              {children}
+              <SessionErrorBoundary>
+                {children}
+              </SessionErrorBoundary>
             </AuthProvider>
             <ToastContainer />
             <AlertContainer />
