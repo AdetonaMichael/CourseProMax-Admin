@@ -493,21 +493,22 @@ export default function CategoriesPage() {
             )}
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="flex md:grid overflow-x-auto md:overflow-visible gap-4 md:grid-cols-2 lg:grid-cols-3 pb-4">
             {categories.map(category => (
-              <div key={category.id} className="bg-white rounded-lg shadow p-4 hover:shadow-md transition">
-                <div className="flex items-start justify-between mb-3">
-                  <div
-                    className="w-12 h-12 rounded-lg flex items-center justify-center"
-                    style={{ backgroundColor: category.color }}
-                  >
-                    <span className="text-white text-lg font-bold">
-                      {category.name.charAt(0).toUpperCase()}
-                    </span>
-                  </div>
-                  <div className="flex gap-2">
-                    <Button
-                      size="sm"
+              <div key={category.id} className="flex-shrink-0 w-full md:w-auto">
+                <div className="bg-white rounded-lg shadow p-4 hover:shadow-md transition h-full">
+                  <div className="flex items-start justify-between mb-3">
+                    <div
+                      className="w-12 h-12 rounded-lg flex items-center justify-center"
+                      style={{ backgroundColor: category.color }}
+                    >
+                      <span className="text-white text-lg font-bold">
+                        {category.name.charAt(0).toUpperCase()}
+                      </span>
+                    </div>
+                    <div className="flex gap-2">
+                      <Button
+                        size="sm"
                       variant="ghost"
                       onClick={() => handleEdit(category)}
                       disabled={saving}
@@ -540,6 +541,7 @@ export default function CategoriesPage() {
                   >
                     {category.is_active ? 'Active' : 'Inactive'}
                   </span>
+                </div>
                 </div>
               </div>
             ))}

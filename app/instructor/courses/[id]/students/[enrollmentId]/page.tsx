@@ -110,55 +110,63 @@ export default function StudentProgressPage() {
           </div>
 
           {/* Key Metrics */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-            <div className="p-4 bg-white rounded-lg border border-gray-200">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-gray-600 text-sm font-medium">Overall Progress</span>
-                <TrendingUp size={20} className="text-blue-600" />
-              </div>
-              <div className="flex items-center gap-3">
-                <div className="flex-1">
-                  <div className="bg-gray-200 h-2 rounded-full overflow-hidden">
-                    <div
-                      className="bg-blue-600 h-full"
-                      style={{ width: `${(studentData.progress || 0) * 100}%` }}
-                    />
-                  </div>
+          <div className="flex md:grid overflow-x-auto md:overflow-visible gap-4 mb-6 md:grid-cols-4 pb-4">
+            <div className="flex-shrink-0 w-full md:w-auto">
+              <div className="p-4 bg-white rounded-lg border border-gray-200">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-gray-600 text-sm font-medium">Overall Progress</span>
+                  <TrendingUp size={20} className="text-blue-600" />
                 </div>
-                <span className="text-2xl font-bold text-gray-900 min-w-[50px] text-right">
-                  {Math.round((studentData.progress || 0) * 100)}%
-                </span>
+                <div className="flex items-center gap-3">
+                  <div className="flex-1">
+                    <div className="bg-gray-200 h-2 rounded-full overflow-hidden">
+                      <div
+                        className="bg-blue-600 h-full"
+                        style={{ width: `${(studentData.progress || 0) * 100}%` }}
+                      />
+                    </div>
+                  </div>
+                  <span className="text-2xl font-bold text-gray-900 min-w-[50px] text-right">
+                    {Math.round((studentData.progress || 0) * 100)}%
+                  </span>
+                </div>
               </div>
             </div>
 
-            <div className="p-4 bg-white rounded-lg border border-gray-200">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-gray-600 text-sm font-medium">Lessons Completed</span>
-                <CheckCircle size={20} className="text-green-600" />
+            <div className="flex-shrink-0 w-full md:w-auto">
+              <div className="p-4 bg-white rounded-lg border border-gray-200">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-gray-600 text-sm font-medium">Lessons Completed</span>
+                  <CheckCircle size={20} className="text-green-600" />
+                </div>
+                <p className="text-2xl font-bold text-gray-900">
+                  {studentData.lessons_completed || 0}
+                  <span className="text-sm text-gray-600 font-normal">/{studentData.total_lessons || 0}</span>
+                </p>
               </div>
-              <p className="text-2xl font-bold text-gray-900">
-                {studentData.lessons_completed || 0}
-                <span className="text-sm text-gray-600 font-normal">/{studentData.total_lessons || 0}</span>
-              </p>
             </div>
 
-            <div className="p-4 bg-white rounded-lg border border-gray-200">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-gray-600 text-sm font-medium">Average Score</span>
-                <Award size={20} className="text-orange-600" />
+            <div className="flex-shrink-0 w-full md:w-auto">
+              <div className="p-4 bg-white rounded-lg border border-gray-200">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-gray-600 text-sm font-medium">Average Score</span>
+                  <Award size={20} className="text-orange-600" />
+                </div>
+                <p className="text-2xl font-bold text-gray-900">{(studentData.average_score || 0).toFixed(1)}%</p>
               </div>
-              <p className="text-2xl font-bold text-gray-900">{(studentData.average_score || 0).toFixed(1)}%</p>
             </div>
 
-            <div className="p-4 bg-white rounded-lg border border-gray-200">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-gray-600 text-sm font-medium">Time Spent</span>
-                <Clock size={20} className="text-purple-600" />
+            <div className="flex-shrink-0 w-full md:w-auto">
+              <div className="p-4 bg-white rounded-lg border border-gray-200">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-gray-600 text-sm font-medium">Time Spent</span>
+                  <Clock size={20} className="text-purple-600" />
+                </div>
+                <p className="text-2xl font-bold text-gray-900">
+                  {studentData.time_spent_hours || 0}
+                  <span className="text-sm text-gray-600 font-normal"> hrs</span>
+                </p>
               </div>
-              <p className="text-2xl font-bold text-gray-900">
-                {studentData.time_spent_hours || 0}
-                <span className="text-sm text-gray-600 font-normal"> hrs</span>
-              </p>
             </div>
           </div>
 

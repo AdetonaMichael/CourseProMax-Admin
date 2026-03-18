@@ -1,8 +1,9 @@
 'use client'
 
 import Link from 'next/link'
-import { ArrowRight, TrendingUp, BookOpen, Users, Award, Brain, Play, BarChart2, Star, Layers, Apple, Download } from 'lucide-react'
+import { ArrowRight, TrendingUp, BookOpen, Users, Award, Brain, Play, BarChart2, Star, Layers, Apple, Download, Home as HomeIcon } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
+import { useSession } from 'next-auth/react'
 
 // ─── Hooks ────────────────────────────────────────────────────────────────────
 function useCounter(target: number, duration = 2000, started = false) {
@@ -144,6 +145,18 @@ function DashboardPreview() {
 // ─── Page ─────────────────────────────────────────────────────────────────────
 export default function Home() {
   const [scrolled, setScrolled] = useState(false)
+  const { data: session, status } = useSession()
+  const isAuthenticated = status === 'authenticated'
+  const user = session?.user
+  const roles = user?.roles || []
+  const isAdmin = roles.includes('admin')
+  const isInstructor = roles.includes('instructor')
+  
+  const getDashboardPath = () => {
+    if (isAdmin) return '/admin'
+    if (isInstructor) return '/instructor'
+    return '/dashboard'
+  }
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40)
@@ -220,12 +233,27 @@ export default function Home() {
             ))}
           </ul>
           <div className="flex items-center gap-3">
-            <a href="/admin" className="hidden sm:block text-sm font-medium text-black border border-gray-200 px-4 py-2 rounded-md hover:bg-gray-100 hover:border-gray-300 transition-all no-underline">
-              Sign In
-            </a>
-            <a href="/register" className="text-sm font-medium text-white bg-black px-4 py-2 rounded-md hover:opacity-80 transition-opacity flex items-center gap-1.5 no-underline">
-              Get Started <ArrowRight size={13} />
-            </a>
+            {isAuthenticated && user ? (
+              <>
+                <div className="hidden sm:block text-right">
+                  <p className="text-xs text-gray-500">Welcome back</p>
+                  <p className="text-sm font-semibold text-gray-900">{user.first_name} {user.last_name}</p>
+                </div>
+                <Link href={getDashboardPath()} className="flex items-center justify-center text-white bg-black p-2 sm:px-4 sm:py-2 rounded-md hover:opacity-80 transition-opacity no-underline gap-2">
+                  <HomeIcon size={18} className="shrink-0" />
+                  <span className="hidden sm:inline text-sm font-medium">Go to Dashboard</span>
+                </Link>
+              </>
+            ) : (
+              <>
+                <a href="/login" className="hidden sm:block text-sm font-medium text-black border border-gray-200 px-4 py-2 rounded-md hover:bg-gray-100 hover:border-gray-300 transition-all no-underline">
+                  Sign In
+                </a>
+                <a href="/register" className="text-sm font-medium text-white bg-black px-4 py-2 rounded-md hover:opacity-80 transition-opacity flex items-center gap-1.5 no-underline">
+                  Get Started <ArrowRight size={13} />
+                </a>
+              </>
+            )}
           </div>
         </nav>
 
@@ -252,12 +280,26 @@ export default function Home() {
 
             {/* CTAs */}
             <div className="anim-up-d3 flex flex-col sm:flex-row items-center justify-center gap-3 flex-wrap">
-              <a href="/admin" className="inline-flex items-center gap-2 text-sm font-medium text-white bg-black px-6 py-3 rounded-lg hover:opacity-80 active:scale-95 transition-all no-underline">
-                Open Dashboard <ArrowRight size={15} />
-              </a>
-              <a href="/demo" className="inline-flex items-center gap-2 text-sm text-gray-500 border border-gray-200 px-6 py-3 rounded-lg hover:border-gray-400 hover:text-black transition-all no-underline">
-                <Play size={13} /> Watch Demo
-              </a>
+              {isAuthenticated ? (
+                <>
+                  <a href={getDashboardPath()} className="inline-flex items-center gap-2 text-sm font-medium text-white bg-black px-6 py-3 sm:px-6 sm:py-3 rounded-lg hover:opacity-80 active:scale-95 transition-all no-underline">
+                    <HomeIcon size={16} className="shrink-0" />
+                    <span className="hidden sm:inline">Go to {isAdmin ? 'Admin' : isInstructor ? 'Instructor' : ''} Dashboard</span>
+                  </a>
+                  <a href="https://tinyurl.com/34sjfar7" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-sm text-gray-500 border border-gray-200 px-6 py-3 rounded-lg hover:border-gray-400 hover:text-black transition-all no-underline">
+                    <Download size={13} /> Download App
+                  </a>
+                </>
+              ) : (
+                <>
+                  <a href="/register" className="inline-flex items-center gap-2 text-sm font-medium text-white bg-black px-6 py-3 rounded-lg hover:opacity-80 active:scale-95 transition-all no-underline">
+                    Get Started <ArrowRight size={15} />
+                  </a>
+                  <a href="/demo" className="inline-flex items-center gap-2 text-sm text-gray-500 border border-gray-200 px-6 py-3 rounded-lg hover:border-gray-400 hover:text-black transition-all no-underline">
+                    <Play size={13} /> Watch Demo
+                  </a>
+                </>
+              )}
             </div>
           </div>
 
@@ -330,7 +372,7 @@ export default function Home() {
             </div>
 
             <div className="border border-gray-200 rounded-xl overflow-hidden">
-              <div className="grid grid-cols-1 md:grid-cols-3">
+              <div className="flex md:grid overflow-x-auto md:overflow-visible md:grid-cols-3">
                 {[
                   { icon: TrendingUp, title: 'Earnings Tracking',    desc: 'Detailed revenue analytics with payout history, trends, and forecasting across all your courses.' },
                   { icon: Users,      title: 'Student Performance',  desc: 'Monitor progress, completion rates, quiz scores, and engagement patterns at scale.' },
@@ -339,7 +381,7 @@ export default function Home() {
                   { icon: BarChart2,  title: 'Analytics Suite',      desc: 'Comprehensive reporting on course performance, student retention, and revenue attribution.' },
                   { icon: Layers,     title: 'Assignment Builder',   desc: 'Create quizzes and assessments with automated grading and instant feedback tools.' },
                 ].map((f, i) => (
-                  <div key={i} className={`feature-grid-cell ${i >= 3 ? 'border-t border-gray-200' : ''}`}>
+                  <div key={i} className={`flex-shrink-0 w-full md:w-auto feature-grid-cell ${i >= 3 ? 'border-t border-gray-200' : ''}`}>
                     <FeatureCard icon={f.icon} title={f.title} desc={f.desc} index={i} />
                   </div>
                 ))}
@@ -446,16 +488,15 @@ export default function Home() {
 
               {/* Download Button */}
               <div className="flex flex-col gap-2">
-                <button 
-                  onClick={() => {
-                    // Direct download fallback
-                    window.open('https://coursepromax.app/download', '_blank')
-                  }}
-                  className="inline-flex items-center justify-center gap-2 text-sm font-medium text-black border-2 border-black bg-white px-8 py-4 rounded-lg hover:bg-black hover:text-white transition-all duration-200 active:scale-95 w-full sm:w-auto"
+                <a 
+                  href="https://tinyurl.com/34sjfar7"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center justify-center gap-2 text-sm font-medium text-black border-2 border-black bg-white px-8 py-4 rounded-lg hover:bg-black hover:text-white transition-all duration-200 active:scale-95 w-full sm:w-auto no-underline"
                 >
                   <Download size={16} className="shrink-0" />
                   <span>Direct Download</span>
-                </button>
+                </a>
                 <p className="text-xs text-gray-500 text-center sm:text-left">Available for iOS 13+ and Android 9+</p>
               </div>
             </div>
@@ -503,24 +544,49 @@ export default function Home() {
 
         {/* ── CTA ── */}
         <section className="py-32 px-6 bg-white border-t border-gray-200 text-center">
-          <h2
-            className="font-black text-black leading-none tracking-tighter mb-5"
-            style={{ ...syne, fontSize: 'clamp(40px, 7vw, 80px)' }}
-          >
-            Start teaching.<br />Start earning.
-          </h2>
-          <p className="text-lg text-gray-500 font-light mb-10 max-w-md mx-auto leading-relaxed">
-            Join thousands of instructors already growing their income on CourseProMax.
-          </p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 flex-wrap mb-4">
-            <a href="/register" className="inline-flex items-center gap-2 text-sm font-medium text-white bg-black px-7 py-3.5 rounded-lg hover:opacity-80 transition-opacity no-underline">
-              Create Free Account <ArrowRight size={15} />
-            </a>
-            <a href="/admin" className="inline-flex items-center gap-2 text-sm text-gray-500 border border-gray-200 px-7 py-3.5 rounded-lg hover:border-gray-400 hover:text-black transition-all no-underline">
-              Explore Dashboard
-            </a>
-          </div>
-          <p className="text-xs text-gray-400">No credit card required · Free plan available</p>
+          {isAuthenticated ? (
+            <>
+              <h2
+                className="font-black text-black leading-none tracking-tighter mb-5"
+                style={{ ...syne, fontSize: 'clamp(40px, 7vw, 80px)' }}
+              >
+                Ready to get started?
+              </h2>
+              <p className="text-lg text-gray-500 font-light mb-10 max-w-md mx-auto leading-relaxed">
+                Access your dashboard and start creating amazing courses today.
+              </p>
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-3 flex-wrap mb-4">
+                <a href={getDashboardPath()} className="inline-flex items-center gap-2 text-sm font-medium text-white bg-black px-7 py-3.5 sm:px-7 sm:py-3.5 rounded-lg hover:opacity-80 transition-opacity no-underline">
+                  <HomeIcon size={16} className="shrink-0" />
+                  <span className="hidden sm:inline">Go to Dashboard</span>
+                </a>
+                <a href="https://tinyurl.com/34sjfar7" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-sm text-gray-500 border border-gray-200 px-7 py-3.5 rounded-lg hover:border-gray-400 hover:text-black transition-all no-underline">
+                  <Download size={15} /> Download App
+                </a>
+              </div>
+            </>
+          ) : (
+            <>
+              <h2
+                className="font-black text-black leading-none tracking-tighter mb-5"
+                style={{ ...syne, fontSize: 'clamp(40px, 7vw, 80px)' }}
+              >
+                Start teaching.<br />Start earning.
+              </h2>
+              <p className="text-lg text-gray-500 font-light mb-10 max-w-md mx-auto leading-relaxed">
+                Join thousands of instructors already growing their income on CourseProMax.
+              </p>
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-3 flex-wrap mb-4">
+                <a href="/register" className="inline-flex items-center gap-2 text-sm font-medium text-white bg-black px-7 py-3.5 rounded-lg hover:opacity-80 transition-opacity no-underline">
+                  Create Free Account <ArrowRight size={15} />
+                </a>
+                <a href="/login" className="inline-flex items-center gap-2 text-sm text-gray-500 border border-gray-200 px-7 py-3.5 rounded-lg hover:border-gray-400 hover:text-black transition-all no-underline">
+                  Sign In
+                </a>
+              </div>
+              <p className="text-xs text-gray-400">No credit card required · Free plan available</p>
+            </>
+          )}
         </section>
 
         {/* ── FOOTER ── */}
@@ -557,8 +623,12 @@ export default function Home() {
             <div className="flex flex-col sm:flex-row justify-between items-center gap-3">
               <p className="text-xs">&copy; 2026 CourseProMax. All rights reserved.</p>
               <div className="flex gap-6">
-                {['Privacy', 'Terms', 'Cookies'].map(l => (
-                  <a key={l} href="#" className="text-xs text-neutral-600 hover:text-neutral-400 transition-colors no-underline">{l}</a>
+                {[
+                  { label: 'Privacy', href: '/privacy' },
+                  { label: 'Terms', href: '/terms' },
+                  { label: 'Cookies', href: '/privacy#cookies-and-tracking' }
+                ].map(link => (
+                  <a key={link.label} href={link.href} className="text-xs text-neutral-600 hover:text-neutral-400 transition-colors no-underline">{link.label}</a>
                 ))}
               </div>
             </div>

@@ -6,6 +6,7 @@ import { ConfirmationDialogProvider } from "@/components/shared/ConfirmationDial
 import { PromptDialogProvider } from "@/components/shared/PromptDialog";
 import { AuthProvider } from "@/components/auth/AuthProvider";
 import { SessionErrorBoundary } from "@/components/auth/SessionErrorBoundary";
+import { LogRocketProvider } from "@/components/logrocket/LogRocketProvider";
 
 export const viewport: Viewport = {
   width: "device-width",
@@ -93,6 +94,7 @@ export default function RootLayout({
         <ConfirmationDialogProvider>
           <PromptDialogProvider>
             <AuthProvider>
+              <LogRocketProvider />
               <SessionErrorBoundary>
                 {children}
               </SessionErrorBoundary>

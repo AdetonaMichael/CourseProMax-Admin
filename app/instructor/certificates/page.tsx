@@ -142,50 +142,58 @@ export default function CertificatesPage() {
       )}
 
       {/* Statistics Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-        <div className="p-4 bg-white rounded-lg border border-gray-200">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-gray-600 text-sm font-medium">Total Certificates</p>
-              <p className="text-2xl font-bold text-gray-900 mt-1">{certificates.length}</p>
+      <div className="flex md:grid overflow-x-auto md:overflow-visible gap-4 mb-6 md:grid-cols-4 pb-4">
+        <div className="flex-shrink-0 w-full md:w-auto">
+          <div className="p-4 bg-white rounded-lg border border-gray-200">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-gray-600 text-sm font-medium">Total Certificates</p>
+                <p className="text-2xl font-bold text-gray-900 mt-1">{certificates.length}</p>
+              </div>
+              <Award size={24} className="text-blue-600" />
             </div>
-            <Award size={24} className="text-blue-600" />
           </div>
         </div>
 
-        <div className="p-4 bg-white rounded-lg border border-gray-200">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-gray-600 text-sm font-medium">Valid</p>
-              <p className="text-2xl font-bold text-green-600 mt-1">
-                {certificates.filter(c => c.status === 'valid').length}
-              </p>
+        <div className="flex-shrink-0 w-full md:w-auto">
+          <div className="p-4 bg-white rounded-lg border border-gray-200">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-gray-600 text-sm font-medium">Valid</p>
+                <p className="text-2xl font-bold text-green-600 mt-1">
+                  {certificates.filter(c => c.status === 'valid').length}
+                </p>
+              </div>
+              <CheckCircle size={24} className="text-green-600" />
             </div>
-            <CheckCircle size={24} className="text-green-600" />
           </div>
         </div>
 
-        <div className="p-4 bg-white rounded-lg border border-gray-200">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-gray-600 text-sm font-medium">Pending</p>
-              <p className="text-2xl font-bold text-yellow-600 mt-1">
-                {certificates.filter(c => c.status === 'pending').length}
-              </p>
+        <div className="flex-shrink-0 w-full md:w-auto">
+          <div className="p-4 bg-white rounded-lg border border-gray-200">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-gray-600 text-sm font-medium">Pending</p>
+                <p className="text-2xl font-bold text-yellow-600 mt-1">
+                  {certificates.filter(c => c.status === 'pending').length}
+                </p>
+              </div>
+              <Clock size={24} className="text-yellow-600" />
             </div>
-            <Clock size={24} className="text-yellow-600" />
           </div>
         </div>
 
-        <div className="p-4 bg-white rounded-lg border border-gray-200">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-gray-600 text-sm font-medium">Revoked</p>
-              <p className="text-2xl font-bold text-red-600 mt-1">
-                {certificates.filter(c => c.status === 'revoked').length}
-              </p>
+        <div className="flex-shrink-0 w-full md:w-auto">
+          <div className="p-4 bg-white rounded-lg border border-gray-200">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-gray-600 text-sm font-medium">Revoked</p>
+                <p className="text-2xl font-bold text-red-600 mt-1">
+                  {certificates.filter(c => c.status === 'revoked').length}
+                </p>
+              </div>
+              <AlertCircle size={24} className="text-red-600" />
             </div>
-            <AlertCircle size={24} className="text-red-600" />
           </div>
         </div>
       </div>

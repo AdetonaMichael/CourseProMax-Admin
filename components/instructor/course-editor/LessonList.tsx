@@ -118,7 +118,7 @@ export const LessonList: React.FC<LessonListProps> = ({
         </div>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+      <div className="flex md:grid overflow-x-auto md:overflow-visible gap-5 md:grid-cols-2 lg:grid-cols-3 pb-4">
         {lessons.map((lesson) => {
           // Check for video: has bunny_video_id OR type is 'video'
           const hasVideo = (!!lesson.bunny_video_id && lesson.bunny_video_id.trim() !== '') || lesson.type === 'video'
@@ -138,6 +138,7 @@ export const LessonList: React.FC<LessonListProps> = ({
           })
           
           return (
+            <div key={lesson.id} className="flex-shrink-0 w-full md:w-auto">
           <div key={lesson.id} className="bg-white border border-gray-200 rounded-lg p-5 transition-all hover:border-blue-600 hover:shadow-lg hover:-translate-y-1">
             <div className="flex justify-between items-start gap-3 mb-3">
               <div className="flex-1">
@@ -222,7 +223,8 @@ export const LessonList: React.FC<LessonListProps> = ({
               </button>
             </div>
           </div>
-        )
+            </div>
+          )
         })}
       </div>
     </div>

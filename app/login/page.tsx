@@ -4,13 +4,13 @@ import { useEffect, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useSession } from 'next-auth/react'
 import { LoginForm } from '@/components/auth/LoginForm'
-import { Metadata } from 'next'
+// import { Metadata } from 'next'
 
 
-export const metadata:Metadata = {
-  'title':'CourseProMax Login',
-  'description': 'Publish Your Education Contents and Start Earning with CourseProMax'
-}
+// export const metadata:Metadata = {
+//   'title':'CourseProMax Login',
+//   'description': 'Publish Your Education Contents and Start Earning with CourseProMax'
+// }
 
 export default function LoginPage() {
   const router = useRouter()

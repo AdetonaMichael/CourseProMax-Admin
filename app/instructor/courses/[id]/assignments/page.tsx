@@ -161,7 +161,7 @@ export default function AssignmentsPage() {
         </div>
       ) : !selectedAssignment ? (
         // Assignments List View
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="flex md:grid overflow-x-auto md:overflow-visible gap-6 md:grid-cols-2 lg:grid-cols-3 pb-4">
           {assignments.length === 0 ? (
             <div className="col-span-full text-center py-12 bg-white rounded-lg border border-gray-200">
               <FileText size={40} className="mx-auto text-gray-400 mb-3" />
@@ -172,12 +172,13 @@ export default function AssignmentsPage() {
             assignments.map(assignment => (
               <div
                 key={assignment.id}
-                className="bg-white rounded-lg border border-gray-200 hover:shadow-md transition-all p-6"
+                className="flex-shrink-0 w-full md:w-auto"
               >
-                <div className="flex items-start justify-between mb-4">
-                  <h3 className="font-semibold text-gray-900 flex-1">{assignment.title}</h3>
-                  {assignment.submitted_count === assignment.total_students ? (
-                    <CheckCircle size={20} className="text-green-600" />
+                <div className="bg-white rounded-lg border border-gray-200 hover:shadow-md transition-all p-6 h-full">
+                  <div className="flex items-start justify-between mb-4">
+                    <h3 className="font-semibold text-gray-900 flex-1">{assignment.title}</h3>
+                    {assignment.submitted_count === assignment.total_students ? (
+                      <CheckCircle size={20} className="text-green-600" />
                   ) : (
                     <AlertCircle size={20} className="text-orange-600" />
                   )}
@@ -222,8 +223,7 @@ export default function AssignmentsPage() {
                   className="w-full py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
                 >
                   View Submissions
-                </button>
-              </div>
+                </button>                </div>              </div>
             ))
           )}
         </div>

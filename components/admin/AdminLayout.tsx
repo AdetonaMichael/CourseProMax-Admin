@@ -81,7 +81,9 @@ export function AdminLayout({ children }: AdminLayoutProps) {
       >
         {/* Logo */}
         <div className="sidebar-header">
+          <Link href="/">
           <h1 className="sidebar-title">CourseProMax</h1>
+          </Link>
           <p className="sidebar-subtitle">Admin Panel</p>
         </div>
 

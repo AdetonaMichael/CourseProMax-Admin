@@ -74,25 +74,31 @@ export default function EarningsPage() {
       {revenueData && (
         <>
           {/* Key Metrics */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <StatCard
-              title="Total Revenue"
-              value={`₦${(revenueData.total_revenue || 0).toLocaleString()}`}
-              description="All-time earnings"
-              icon={<DollarSign size={28} className="text-green-600" />}
-            />
-            <StatCard
-              title="This Month"
-              value={`₦${(revenueData.this_month_revenue || 0).toLocaleString()}`}
-              description="Current month earnings"
-              icon={<TrendingUp size={28} className="text-blue-600" />}
-            />
-            <StatCard
-              title="Last Month"
-              value={`₦${(revenueData.last_month_revenue || 0).toLocaleString()}`}
-              description="Previous month earnings"
-              icon={<BarChart3 size={28} className="text-gray-600" />}
-            />
+          <div className="flex md:grid overflow-x-auto md:overflow-visible gap-6 mb-8 md:grid-cols-3 pb-4">
+            <div className="flex-shrink-0 w-full md:w-auto">
+              <StatCard
+                title="Total Revenue"
+                value={`₦${(revenueData.total_revenue || 0).toLocaleString()}`}
+                description="All-time earnings"
+                icon={<DollarSign size={28} className="text-green-600" />}
+              />
+            </div>
+            <div className="flex-shrink-0 w-full md:w-auto">
+              <StatCard
+                title="This Month"
+                value={`₦${(revenueData.this_month_revenue || 0).toLocaleString()}`}
+                description="Current month earnings"
+                icon={<TrendingUp size={28} className="text-blue-600" />}
+              />
+            </div>
+            <div className="flex-shrink-0 w-full md:w-auto">
+              <StatCard
+                title="Last Month"
+                value={`₦${(revenueData.last_month_revenue || 0).toLocaleString()}`}
+                description="Previous month earnings"
+                icon={<BarChart3 size={28} className="text-gray-600" />}
+              />
+            </div>
           </div>
 
           {/* Revenue Trend */}

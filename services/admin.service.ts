@@ -1,46 +1,6 @@
-import { getSession } from 'next-auth/react';
-import axios, { AxiosInstance, AxiosError } from 'axios';
+'use client'
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8003/api/v1';
-
-let adminAPI: AxiosInstance | null = null;
-
-// Initialize API client with token
-async function initializeAPI() {
-  if (adminAPI) return adminAPI;
-
-  const session = await getSession();
-  const token = session?.accessToken;
-
-  if (!token) {
-    throw new Error('No authentication token found');
-  }
-
-  adminAPI = axios.create({
-    baseURL: API_BASE_URL,
-    headers: {
-      'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
-    },
-  });
-
-  // Error interceptor
-  adminAPI.interceptors.response.use(
-    response => response,
-    error => {
-      if (error.response?.status === 401) {
-        // Token expired or invalid
-        if (typeof window !== 'undefined') {
-          window.location.href = '/login';
-        }
-      }
-      return Promise.reject(error);
-    }
-  );
-
-  return adminAPI;
-}
+import { apiClient } from './api-client';
 
 // ==================== USER MANAGEMENT ====================
 
@@ -69,9 +29,8 @@ export interface UsersResponse {
 
 export async function fetchUsers(page = 1, filters: Record<string, any> = {}): Promise<UsersResponse> {
   try {
-    const api = await initializeAPI();
-    const apiUrl = api.defaults.baseURL + '/admin/users'
-    console.log('[Admin API] Fetching users from:', apiUrl, { page, filters })
+    const api = apiClient;
+    console.log('[Admin API] Fetching users:', { page, filters })
     
     const response = await api.get('/admin/users', {
       params: {
@@ -100,7 +59,7 @@ export async function fetchUsers(page = 1, filters: Record<string, any> = {}): P
 
 export async function fetchUser(userId: number): Promise<User> {
   try {
-    const api = await initializeAPI();
+    const api = apiClient;
     const response = await api.get(`/admin/users/${userId}`);
     return response.data.data.user;
   } catch (error) {
@@ -119,7 +78,7 @@ export async function createUser(userData: {
   roles?: string[];
 }): Promise<User> {
   try {
-    const api = await initializeAPI();
+    const api = apiClient;
     const response = await api.post('/admin/users', userData);
     return response.data.data.user;
   } catch (error) {
@@ -132,7 +91,7 @@ export async function updateUser(
   userData: Partial<User>
 ): Promise<User> {
   try {
-    const api = await initializeAPI();
+    const api = apiClient;
     const response = await api.put(`/admin/users/${userId}`, userData);
     return response.data.data.user;
   } catch (error) {
@@ -142,7 +101,7 @@ export async function updateUser(
 
 export async function deleteUser(userId: number): Promise<void> {
   try {
-    const api = await initializeAPI();
+    const api = apiClient;
     await api.delete(`/admin/users/${userId}`);
   } catch (error) {
     throw handleAPIError(error);
@@ -151,7 +110,7 @@ export async function deleteUser(userId: number): Promise<void> {
 
 export async function assignRoleToUser(userId: number, roles: string[]): Promise<User> {
   try {
-    const api = await initializeAPI();
+    const api = apiClient;
     const response = await api.post(`/admin/users/${userId}/assign-role`, { roles });
     return response.data.data.user;
   } catch (error) {
@@ -161,7 +120,7 @@ export async function assignRoleToUser(userId: number, roles: string[]): Promise
 
 export async function revokeRoleFromUser(userId: number, roles: string[]): Promise<User> {
   try {
-    const api = await initializeAPI();
+    const api = apiClient;
     const response = await api.delete(`/admin/users/${userId}/revoke-role`, {
       data: { roles },
     });
@@ -176,7 +135,7 @@ export async function changeUserStatus(
   status: 'active' | 'inactive' | 'blocked'
 ): Promise<User> {
   try {
-    const api = await initializeAPI();
+    const api = apiClient;
     const response = await api.put(`/admin/users/${userId}/status`, { status });
     return response.data.data.user;
   } catch (error) {
@@ -190,7 +149,7 @@ export async function blockUser(
   blockedUntil?: string
 ): Promise<User> {
   try {
-    const api = await initializeAPI();
+    const api = apiClient;
     const response = await api.post(`/admin/users/${userId}/block`, {
       reason: reason || 'No reason provided',
       blocked_until: blockedUntil || null,
@@ -203,7 +162,7 @@ export async function blockUser(
 
 export async function unblockUser(userId: number): Promise<User> {
   try {
-    const api = await initializeAPI();
+    const api = apiClient;
     const response = await api.post(`/admin/users/${userId}/unblock`);
     return response.data.data.user;
   } catch (error) {
@@ -225,7 +184,7 @@ export async function getUserFullProfile(
   include: string[] = ['wallet', 'transactions', 'enrollments']
 ): Promise<UserFullProfile> {
   try {
-    const api = await initializeAPI();
+    const api = apiClient;
     const includeParam = include.join(',');
     const response = await api.get(`/admin/users/${userId}/full-profile`, {
       params: { include: includeParam },
@@ -238,7 +197,7 @@ export async function getUserFullProfile(
 
 export async function getUserWallet(userId: number): Promise<any> {
   try {
-    const api = await initializeAPI();
+    const api = apiClient;
     const response = await api.get(`/admin/users/${userId}/wallet`);
     return response.data.data.wallet;
   } catch (error) {
@@ -262,7 +221,7 @@ export async function getUserTransactions(
   filters: Record<string, any> = {}
 ): Promise<TransactionsResponse> {
   try {
-    const api = await initializeAPI();
+    const api = apiClient;
     const response = await api.get(`/admin/users/${userId}/transactions`, {
       params: {
         page,
@@ -297,7 +256,7 @@ export async function getUserEnrolledCourses(
   filters: Record<string, any> = {}
 ): Promise<CoursesEnrolledResponse> {
   try {
-    const api = await initializeAPI();
+    const api = apiClient;
     const response = await api.get(`/admin/users/${userId}/courses`, {
       params: {
         page,
@@ -346,7 +305,7 @@ export interface CoursesResponse {
 
 export async function fetchCourses(page = 1, filters: Record<string, any> = {}): Promise<CoursesResponse> {
   try {
-    const api = await initializeAPI();
+    const api = apiClient;
     console.log('[Admin API] Fetching courses:', { page, filters });
     const response = await api.get('/admin/courses', {
       params: {
@@ -367,7 +326,7 @@ export async function fetchCourses(page = 1, filters: Record<string, any> = {}):
 
 export async function fetchCourse(courseId: number): Promise<Course> {
   try {
-    const api = await initializeAPI();
+    const api = apiClient;
     const response = await api.get(`/admin/courses/${courseId}`);
     return response.data.data.course;
   } catch (error) {
@@ -377,7 +336,7 @@ export async function fetchCourse(courseId: number): Promise<Course> {
 
 export async function createCourse(courseData: Partial<Course>): Promise<Course> {
   try {
-    const api = await initializeAPI();
+    const api = apiClient;
     const response = await api.post('/admin/courses', courseData);
     return response.data.data.course;
   } catch (error) {
@@ -387,7 +346,7 @@ export async function createCourse(courseData: Partial<Course>): Promise<Course>
 
 export async function updateCourse(courseId: number, courseData: Partial<Course>): Promise<Course> {
   try {
-    const api = await initializeAPI();
+    const api = apiClient;
     const response = await api.put(`/admin/courses/${courseId}`, courseData);
     return response.data.data.course;
   } catch (error) {
@@ -397,7 +356,7 @@ export async function updateCourse(courseId: number, courseData: Partial<Course>
 
 export async function deleteCourse(courseId: number): Promise<void> {
   try {
-    const api = await initializeAPI();
+    const api = apiClient;
     await api.delete(`/admin/courses/${courseId}`);
   } catch (error) {
     throw handleAPIError(error);
@@ -409,7 +368,7 @@ export async function updateCoursePricing(
   data: { amount: number; currency: string; is_lifetime: boolean }
 ): Promise<any> {
   try {
-    const api = await initializeAPI();
+    const api = apiClient;
     const response = await api.put(`/admin/courses/${courseId}/pricing`, data);
     return response.data.data;
   } catch (error) {
@@ -419,7 +378,7 @@ export async function updateCoursePricing(
 
 export async function makeCourseFree(courseId: number): Promise<void> {
   try {
-    const api = await initializeAPI();
+    const api = apiClient;
     await api.delete(`/admin/courses/${courseId}/pricing`);
   } catch (error) {
     throw handleAPIError(error);
@@ -615,7 +574,7 @@ export interface EnrollmentsResponse {
 
 export async function fetchEnrollments(page = 1, filters: Record<string, any> = {}): Promise<EnrollmentsResponse> {
   try {
-    const api = await initializeAPI();
+    const api = apiClient;
     console.log('[Admin API] Fetching enrollments:', { page, filters });
     const response = await api.get('/admin/enrollments', {
       params: {
@@ -635,7 +594,7 @@ export async function fetchEnrollments(page = 1, filters: Record<string, any> = 
 
 export async function fetchEnrollmentDetail(enrollmentId: number): Promise<EnrollmentDetailResponse> {
   try {
-    const api = await initializeAPI();
+    const api = apiClient;
     console.log('[Admin API] Fetching enrollment detail:', { enrollmentId });
     const response = await api.get(`/admin/enrollments/${enrollmentId}`);
     return response.data.data;
@@ -646,7 +605,7 @@ export async function fetchEnrollmentDetail(enrollmentId: number): Promise<Enrol
 
 export async function fetchEnrollmentStats(): Promise<any> {
   try {
-    const api = await initializeAPI();
+    const api = apiClient;
     console.log('[Admin API] Fetching enrollment stats');
     const response = await api.get('/admin/enrollments/stats/overview');
     console.log('[Admin API] Stats fetched:', response.data);
@@ -663,7 +622,7 @@ export async function createEnrollment(
   notes?: string
 ): Promise<Enrollment> {
   try {
-    const api = await initializeAPI();
+    const api = apiClient;
     const response = await api.post('/admin/enrollments', {
       user_id: userId,
       course_id: courseId,
@@ -682,7 +641,7 @@ export async function bulkEnrollUsers(
   notes?: string
 ): Promise<any> {
   try {
-    const api = await initializeAPI();
+    const api = apiClient;
     const response = await api.post('/admin/enrollments/bulk/enroll', {
       course_id: courseId,
       user_ids: userIds,
@@ -697,7 +656,7 @@ export async function bulkEnrollUsers(
 
 export async function updateEnrollment(enrollmentId: number, data: Partial<Enrollment>): Promise<Enrollment> {
   try {
-    const api = await initializeAPI();
+    const api = apiClient;
     const response = await api.put(`/admin/enrollments/${enrollmentId}`, data);
     return response.data.data.enrollment;
   } catch (error) {
@@ -707,7 +666,7 @@ export async function updateEnrollment(enrollmentId: number, data: Partial<Enrol
 
 export async function deleteEnrollment(enrollmentId: number): Promise<void> {
   try {
-    const api = await initializeAPI();
+    const api = apiClient;
     await api.delete(`/admin/enrollments/${enrollmentId}`);
   } catch (error) {
     throw handleAPIError(error);
@@ -739,7 +698,7 @@ export interface CategoriesResponse {
 
 export async function fetchCategories(page = 1, per_page = 20): Promise<CategoriesResponse> {
   try {
-    const api = await initializeAPI();
+    const api = apiClient;
     const response = await api.get('/admin/categories', {
       params: { page, per_page },
     });
@@ -751,7 +710,7 @@ export async function fetchCategories(page = 1, per_page = 20): Promise<Categori
 
 export async function fetchCategory(categoryId: number): Promise<Category> {
   try {
-    const api = await initializeAPI();
+    const api = apiClient;
     const response = await api.get(`/admin/categories/${categoryId}`);
     return response.data.data.category;
   } catch (error) {
@@ -766,7 +725,7 @@ export async function createCategory(categoryData: {
   is_active: boolean;
 }): Promise<Category> {
   try {
-    const api = await initializeAPI();
+    const api = apiClient;
     const response = await api.post('/admin/categories', categoryData);
     return response.data.data.category;
   } catch (error) {
@@ -776,7 +735,7 @@ export async function createCategory(categoryData: {
 
 export async function updateCategory(categoryId: number, categoryData: Partial<Category>): Promise<Category> {
   try {
-    const api = await initializeAPI();
+    const api = apiClient;
     const response = await api.put(`/admin/categories/${categoryId}`, categoryData);
     return response.data.data.category;
   } catch (error) {
@@ -786,7 +745,7 @@ export async function updateCategory(categoryId: number, categoryData: Partial<C
 
 export async function deleteCategory(categoryId: number): Promise<void> {
   try {
-    const api = await initializeAPI();
+    const api = apiClient;
     await api.delete(`/admin/categories/${categoryId}`);
   } catch (error) {
     throw handleAPIError(error);
@@ -811,7 +770,7 @@ export interface Permission {
 
 export async function fetchRoles(): Promise<Role[]> {
   try {
-    const api = await initializeAPI();
+    const api = apiClient;
     const response = await api.get('/role/roles');
     return response.data.data.roles;
   } catch (error) {
@@ -821,7 +780,7 @@ export async function fetchRoles(): Promise<Role[]> {
 
 export async function fetchPermissions(): Promise<Permission[]> {
   try {
-    const api = await initializeAPI();
+    const api = apiClient;
     const response = await api.get('/role/permissions');
     return response.data.data.permissions;
   } catch (error) {
@@ -831,7 +790,7 @@ export async function fetchPermissions(): Promise<Permission[]> {
 
 export async function createRole(roleName: string): Promise<Role> {
   try {
-    const api = await initializeAPI();
+    const api = apiClient;
     const response = await api.post('/role/roles', { name: roleName });
     return response.data.data.role;
   } catch (error) {
@@ -841,7 +800,7 @@ export async function createRole(roleName: string): Promise<Role> {
 
 export async function createPermission(permissionName: string): Promise<Permission> {
   try {
-    const api = await initializeAPI();
+    const api = apiClient;
     const response = await api.post('/role/permissions', { name: permissionName });
     return response.data.data.permission;
   } catch (error) {
@@ -873,7 +832,7 @@ export async function sendNotification(
   type = 'info'
 ): Promise<void> {
   try {
-    const api = await initializeAPI();
+    const api = apiClient;
     await api.post('/admin/notifications/send-to-user', {
       user_id: userId,
       title,
@@ -892,7 +851,7 @@ export async function sendBulkNotification(
   type = 'info'
 ): Promise<any> {
   try {
-    const api = await initializeAPI();
+    const api = apiClient;
     const response = await api.post('/admin/notifications/send-to-users', {
       user_ids: userIds,
       title,

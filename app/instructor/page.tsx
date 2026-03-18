@@ -214,16 +214,17 @@ export default function InstructorDashboard() {
   return (
     <InstructorLayout>
       {/* Key Metrics Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <div className="flex md:grid overflow-x-auto md:overflow-visible gap-6 mb-8 md:grid-cols-2 lg:grid-cols-4 pb-4">
         {keyMetrics.map((metric, idx) => (
-          <StatCard
-            key={idx}
-            title={metric.title}
-            value={metric.value}
-            icon={metric.icon}
-            description={metric.description}
-            trend={metric.trend}
-          />
+          <div key={idx} className="flex-shrink-0 w-full md:w-auto">
+            <StatCard
+              title={metric.title}
+              value={metric.value}
+              icon={metric.icon}
+              description={metric.description}
+              trend={metric.trend}
+            />
+          </div>
         ))}
       </div>
 

@@ -195,15 +195,16 @@ export default function AdminDashboard() {
   return (
     <AdminLayout>
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <div className="flex md:grid overflow-x-auto md:overflow-visible gap-6 mb-8 md:grid-cols-2 lg:grid-cols-4 pb-4">
         {statCards.map((card, idx) => (
-          <StatCard
-            key={idx}
-            title={card.title}
-            value={card.value}
-            icon={card.icon}
-            description={card.description}
-          />
+          <div key={idx} className="flex-shrink-0 w-full md:w-auto">
+            <StatCard
+              title={card.title}
+              value={card.value}
+              icon={card.icon}
+              description={card.description}
+            />
+          </div>
         ))}
       </div>
 

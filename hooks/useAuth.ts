@@ -1,9 +1,10 @@
 'use client'
 
-import { useCallback, useState } from 'react'
+import { useCallback, useState, useEffect } from 'react'
 import { useSession, signIn, signOut } from 'next-auth/react'
 import { RegisterRequest } from '@/types'
 import { authService } from '@/services/auth.service'
+import { setStoredToken } from '@/utils/storage.utils'
 
 export function useAuth() {
   const { data: session, status, update } = useSession()
@@ -14,6 +15,14 @@ export function useAuth() {
 
   const isLoading = status === 'loading'
   const isAuthenticated = status === 'authenticated'
+
+  // Auto-save token to localStorage whenever session updates with a token
+  useEffect(() => {
+    if (session?.accessToken && isAuthenticated) {
+      console.debug('[useAuth] Session updated with token - saving to localStorage')
+      setStoredToken(session.accessToken)
+    }
+  }, [session, isAuthenticated])
 
   const login = useCallback(
     async (email: string, password: string, channel: string = 'web') => {

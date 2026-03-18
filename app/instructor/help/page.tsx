@@ -103,32 +103,35 @@ export default function InstructorHelpPage() {
       </div>
 
       {/* Support Options */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+      <div className="flex md:grid overflow-x-auto md:overflow-visible gap-6 mb-8 md:grid-cols-3 pb-4">
         {helpOptions.map((option, idx) => (
-          <a
-            key={idx}
-            href={option.link}
-            className="p-6 bg-white rounded-lg border border-gray-200 hover:border-blue-400 hover:shadow-lg transition-all"
-          >
-            <div className="mb-3">{option.icon}</div>
-            <h3 className="font-semibold text-gray-900 mb-1">{option.title}</h3>
-            <p className="text-sm text-gray-600">{option.description}</p>
-          </a>
+          <div key={idx} className="flex-shrink-0 w-full md:w-auto">
+            <a
+              href={option.link}
+              className="p-6 bg-white rounded-lg border border-gray-200 hover:border-blue-400 hover:shadow-lg transition-all block"
+            >
+              <div className="mb-3">{option.icon}</div>
+              <h3 className="font-semibold text-gray-900 mb-1">{option.title}</h3>
+              <p className="text-sm text-gray-600">{option.description}</p>
+            </a>
+          </div>
         ))}
       </div>
 
       {/* Resource Cards */}
       <div className="mb-8">
         <h2 className="text-lg font-bold text-gray-900 mb-4">Learning Resources</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="flex md:grid overflow-x-auto md:overflow-visible gap-4 md:grid-cols-2 lg:grid-cols-4 pb-4">
           {resources.map((resource, idx) => (
             <div
               key={idx}
-              className="p-4 bg-white rounded-lg border border-gray-200 hover:border-blue-400 hover:shadow-md transition-all cursor-pointer"
+              className="flex-shrink-0 w-full md:w-auto md:p-0"
             >
+              <div className="p-4 bg-white rounded-lg border border-gray-200 hover:border-blue-400 hover:shadow-md transition-all cursor-pointer">
               <div className="mb-3">{resource.icon}</div>
-              <h4 className="font-semibold text-gray-900 mb-1 text-sm">{resource.title}</h4>
-              <p className="text-xs text-gray-600">{resource.description}</p>
+                <h4 className="font-semibold text-gray-900 mb-1 text-sm">{resource.title}</h4>
+                <p className="text-xs text-gray-600">{resource.description}</p>
+              </div>
             </div>
           ))}
         </div>
@@ -137,7 +140,7 @@ export default function InstructorHelpPage() {
       {/* Video Tutorials */}
       <div className="mb-8">
         <h2 className="text-lg font-bold text-gray-900 mb-4">Getting Started Videos</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="flex md:grid overflow-x-auto md:overflow-visible gap-6 md:grid-cols-2 lg:grid-cols-3 pb-4">
           {[
             { title: 'Creating Your First Course', duration: '5:30' },
             { title: 'Adding Course Content & Lessons', duration: '8:15' },
@@ -148,12 +151,14 @@ export default function InstructorHelpPage() {
           ].map((video, idx) => (
             <div
               key={idx}
-              className="aspect-video bg-gray-100 rounded-lg flex items-center justify-center hover:bg-gray-200 transition-colors cursor-pointer border border-gray-200"
+              className="flex-shrink-0 w-full md:w-auto"
             >
+              <div className="aspect-video bg-gray-100 rounded-lg flex items-center justify-center hover:bg-gray-200 transition-colors cursor-pointer border border-gray-200">
               <div className="text-center">
-                <div className="text-4xl mb-2">▶</div>
-                <p className="text-sm font-medium text-gray-700 px-2">{video.title}</p>
-                <p className="text-xs text-gray-600 mt-1">{video.duration}</p>
+                  <div className="text-4xl mb-2">▶</div>
+                  <p className="text-sm font-medium text-gray-700 px-2">{video.title}</p>
+                  <p className="text-xs text-gray-600 mt-1">{video.duration}</p>
+                </div>
               </div>
             </div>
           ))}
