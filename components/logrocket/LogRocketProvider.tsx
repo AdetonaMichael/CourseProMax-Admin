@@ -19,12 +19,12 @@ export function LogRocketProvider() {
   // Identify user when session changes
   useEffect(() => {
     if (status === 'authenticated' && session?.user) {
-      const user = session.user
+      const user = session.user as any
       identifyUserInLogRocket(
-        user.id || user.email || 'unknown',
+        String(user.id || user.email || 'unknown'),
         user.email,
         user.name,
-        (user as any).role || 'user'
+        user.role || 'user'
       )
     }
   }, [status, session])

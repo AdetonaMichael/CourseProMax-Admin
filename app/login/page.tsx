@@ -1,18 +1,17 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useSession } from 'next-auth/react'
 import { LoginForm } from '@/components/auth/LoginForm'
 // import { Metadata } from 'next'
-
 
 // export const metadata:Metadata = {
 //   'title':'CourseProMax Login',
 //   'description': 'Publish Your Education Contents and Start Earning with CourseProMax'
 // }
 
-export default function LoginPage() {
+function LoginPageContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const { data: session, status } = useSession()
@@ -148,5 +147,26 @@ export default function LoginPage() {
         <p className="text-sm text-gray-400 tracking-widest uppercase">Redirecting...</p>
       </div>
     </div>
+  )
+}
+
+// Loading fallback
+function LoginPageFallback() {
+  return (
+    <div className="min-h-screen bg-white flex items-center justify-center">
+      <div className="flex flex-col items-center gap-4">
+        <div className="w-8 h-8 border-2 border-gray-200 border-t-black rounded-full animate-spin" />
+        <p className="text-sm text-gray-400 tracking-widest uppercase">Loading</p>
+      </div>
+    </div>
+  )
+}
+
+// Export with Suspense wrapper for useSearchParams()
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<LoginPageFallback />}>
+      <LoginPageContent />
+    </Suspense>
   )
 }
