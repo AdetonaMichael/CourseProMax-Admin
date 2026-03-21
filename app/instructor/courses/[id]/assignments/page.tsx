@@ -335,7 +335,7 @@ export default function AssignmentsPage() {
                               : 'bg-yellow-100 text-yellow-800'
                           }`}
                         >
-                          {submission.status.charAt(0).toUpperCase() + submission.status.slice(1)}
+                          {submission.status ? submission.status.charAt(0).toUpperCase() + submission.status.slice(1) : 'Unknown'}
                         </span>
                       </td>
                       <td className="px-6 py-4">

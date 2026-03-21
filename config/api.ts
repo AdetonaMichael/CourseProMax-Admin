@@ -12,4 +12,8 @@ export const API_ENDPOINTS = {
     LESSON_QUIZ: (courseId: number, lessonId: number) => 
       `${API_BASE_URL}/admin/courses/${courseId}/lessons/${lessonId}/quiz`,
   },
+  INSTRUCTOR: {
+    LESSON_VIDEO: (courseId: number, lessonId: number) => 
+      `${API_BASE_URL}/instructor/courses/${courseId}/lessons/${lessonId}/video`,
+  },
 };

@@ -164,7 +164,7 @@ export const QuizBuilder: React.FC<QuizBuilderProps> = ({
                 value={formData.title || ''}
                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                 disabled={loading}
-                className={`w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:border-blue-600 disabled:bg-gray-100 ${errors.title ? 'border-red-500' : 'border-gray-300'}`}
+                className={`w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:border-gray-400 disabled:bg-gray-100 ${errors.title ? 'border-red-500' : 'border-gray-300'}`}
               />
               {errors.title && <span className="text-red-600 text-xs mt-1">{errors.title}</span>}
             </div>
@@ -178,7 +178,7 @@ export const QuizBuilder: React.FC<QuizBuilderProps> = ({
                 min="0"
                 max="100"
                 disabled={loading}
-                className={`w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:border-blue-600 disabled:bg-gray-100 ${errors.passing_score ? 'border-red-500' : 'border-gray-300'}`}
+                className={`w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:border-gray-400 disabled:bg-gray-100 ${errors.passing_score ? 'border-red-500' : 'border-gray-300'}`}
               />
               {errors.passing_score && <span className="text-red-600 text-xs mt-1">{errors.passing_score}</span>}
             </div>
@@ -193,7 +193,7 @@ export const QuizBuilder: React.FC<QuizBuilderProps> = ({
                 onChange={(e) => setFormData({ ...formData, time_limit_minutes: parseInt(e.target.value) })}
                 min="1"
                 disabled={loading}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-blue-600 disabled:bg-gray-100"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-gray-400 disabled:bg-gray-100"
               />
             </div>
 
@@ -225,7 +225,7 @@ export const QuizBuilder: React.FC<QuizBuilderProps> = ({
           <div className="mb-8">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">Question Builder</h3>
 
-            <div className="bg-blue-50 p-4 rounded-lg mb-6 border border-blue-200">
+            <div className="bg-gray-50 p-4 rounded-lg mb-6 border border-gray-200">
               <div className="mb-4">
                 <label className="block text-sm font-medium text-gray-900 mb-2">Question Type</label>
                 <select
@@ -234,7 +234,7 @@ export const QuizBuilder: React.FC<QuizBuilderProps> = ({
                     ...currentQuestion,
                     question_type: e.target.value as any,
                   })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-blue-600"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-gray-400"
                 >
                   <option value="multiple_choice">Multiple Choice</option>
                   <option value="true_false">True/False</option>
@@ -249,7 +249,7 @@ export const QuizBuilder: React.FC<QuizBuilderProps> = ({
                   onChange={(e) => setCurrentQuestion({ ...currentQuestion, question_text: e.target.value })}
                   placeholder="Enter your question"
                   rows={2}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-blue-600 resize-vertical"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-gray-400 resize-vertical"
                 />
               </div>
 
@@ -260,7 +260,7 @@ export const QuizBuilder: React.FC<QuizBuilderProps> = ({
                     <button
                       type="button"
                       onClick={addOption}
-                      className="flex items-center gap-1 px-2 py-1 text-xs bg-blue-600 text-white rounded hover:bg-blue-700"
+                      className="flex items-center gap-1 px-2 py-1 text-xs bg-gray-600 text-white rounded hover:bg-gray-700"
                     >
                       <Plus size={14} />
                       Add Option
@@ -274,7 +274,7 @@ export const QuizBuilder: React.FC<QuizBuilderProps> = ({
                           type="checkbox"
                           checked={option.is_correct || false}
                           onChange={(e) => updateOption(idx, 'is_correct', e.target.checked)}
-                          className="w-4 h-4 accent-green-600"
+                          className="w-4 h-4 accent-gray-600"
                           title="Mark as correct"
                         />
                         <input
@@ -282,7 +282,7 @@ export const QuizBuilder: React.FC<QuizBuilderProps> = ({
                           value={option.text || ''}
                           onChange={(e) => updateOption(idx, 'text', e.target.value)}
                           placeholder={`Option ${idx + 1}`}
-                          className="flex-1 px-3 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:border-blue-600"
+                          className="flex-1 px-3 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:border-gray-400"
                         />
                         {(currentQuestion.options?.length || 0) > 1 && (
                           <button
@@ -306,14 +306,14 @@ export const QuizBuilder: React.FC<QuizBuilderProps> = ({
                   value={currentQuestion.points || 1}
                   onChange={(e) => setCurrentQuestion({ ...currentQuestion, points: parseInt(e.target.value) || 1 })}
                   min="1"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-blue-600"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-gray-400"
                 />
               </div>
 
               <button
                 type="button"
                 onClick={addQuestion}
-                className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition"
+                className="w-full px-4 py-2 bg-gray-600 text-white rounded-lg text-sm font-medium hover:bg-gray-700 transition"
               >
                 <Plus size={16} className="inline mr-2" />
                 Add Question
@@ -356,7 +356,7 @@ export const QuizBuilder: React.FC<QuizBuilderProps> = ({
             <button
               type="submit"
               disabled={loading}
-              className="flex items-center gap-2 px-5 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg text-sm font-medium hover:from-blue-700 hover:to-purple-700 disabled:opacity-50 transition transform hover:-translate-y-0.5"
+              className="flex items-center gap-2 px-5 py-2 bg-black text-white rounded-lg text-sm font-medium hover:bg-gray-800 disabled:opacity-50 transition"
             >
               {loading ? (
                 <>

@@ -47,13 +47,16 @@ export interface InstructorCourse {
   title: string;
   description?: string;
   thumbnail?: string;
+  category_id?: number;
+  category_name?: string;
   level: string;
   is_active: boolean;
   total_lessons: number;
   total_students: number;
   rating: number;
-  category_name?: string;
   price?: number;
+  duration?: string;
+  certificate_available?: boolean;
   created_at: string;
 }
 

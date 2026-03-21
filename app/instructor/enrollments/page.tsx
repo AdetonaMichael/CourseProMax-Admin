@@ -106,7 +106,7 @@ export default function EnrollmentsPage() {
                         ? 'bg-blue-100 text-blue-800'
                         : 'bg-gray-100 text-gray-800'
                     }`}>
-                      {status.charAt(0).toUpperCase() + status.slice(1)}
+                      {status ? status.charAt(0).toUpperCase() + status.slice(1) : 'Unknown'}
                     </span>
                   ),
                 },

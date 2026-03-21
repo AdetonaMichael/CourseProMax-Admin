@@ -281,7 +281,7 @@ export default function CertificatesPage() {
                           : 'bg-red-100 text-red-800'
                       }`}
                     >
-                      {cert.status.charAt(0).toUpperCase() + cert.status.slice(1)}
+                      {cert.status ? cert.status.charAt(0).toUpperCase() + cert.status.slice(1) : 'Unknown'}
                     </span>
                   </td>
                   <td className="px-6 py-4">
@@ -397,7 +397,7 @@ export default function CertificatesPage() {
                       : 'text-red-600'
                   }`}
                 >
-                  {selectedCert.status.charAt(0).toUpperCase() + selectedCert.status.slice(1)}
+                  {selectedCert.status ? selectedCert.status.charAt(0).toUpperCase() + selectedCert.status.slice(1) : 'Unknown'}
                 </span>
               </div>
             </div>

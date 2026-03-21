@@ -456,6 +456,7 @@ export default function CourseDetailsPage() {
 
       {videoManagerOpen && selectedLesson && (
         <VideoManager
+          courseId={courseId}
           lesson={selectedLesson}
           isOpen={videoManagerOpen}
           onClose={() => setVideoManagerOpen(false)}

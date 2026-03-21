@@ -2,7 +2,8 @@
 
 import React, { useState, useEffect } from 'react'
 import { X, Loader } from 'lucide-react'
-import { courseService, CreateCourseRequest, fetchAllCategories, Category } from '@/services/course.service'
+import { fetchAllCategories, Category } from '@/services/course.service'
+import { createCourse, handleInstructorAPIError, InstructorCourse } from '@/services/instructor.service'
 import { useAlert } from '@/hooks/useAlert'
 
 interface CourseCreationModalProps {
@@ -22,7 +23,6 @@ export function CourseCreationModal({ isOpen, onClose, onSuccess }: CourseCreati
     title: '',
     description: '',
     category_id: '',
-    instructor_name: '',
     level: 'Beginner' as 'Beginner' | 'Intermediate' | 'Advanced',
     price: '',
     duration: '',
@@ -85,10 +85,7 @@ export function CourseCreationModal({ isOpen, onClose, onSuccess }: CourseCreati
     if (!formData.category_id) {
       newErrors.category_id = ['Category is required']
     }
-    if (!formData.instructor_name.trim()) {
-      newErrors.instructor_name = ['Instructor name is required']
-    }
-    if (!formData.price || parseFloat(formData.price) < 0) {
+    if (formData.price && parseFloat(formData.price) < 0) {
       newErrors.price = ['Price must be 0 or higher']
     }
 
@@ -107,11 +104,10 @@ export function CourseCreationModal({ isOpen, onClose, onSuccess }: CourseCreati
       setSubmitting(true)
       setSubmitError(null)
 
-      const payload: CreateCourseRequest = {
+      const payload: Partial<InstructorCourse> = {
         title: formData.title,
         description: formData.description,
         category_id: parseInt(formData.category_id as string),
-        instructor_name: formData.instructor_name,
         level: formData.level,
         price: formData.price ? parseFloat(formData.price) : 0,
         duration: formData.duration || '',
@@ -120,7 +116,7 @@ export function CourseCreationModal({ isOpen, onClose, onSuccess }: CourseCreati
         is_active: formData.is_active,
       }
 
-      await courseService.createCourse(payload)
+      await createCourse(payload)
 
       alert.success('Course created successfully!')
       onSuccess?.()
@@ -131,7 +127,6 @@ export function CourseCreationModal({ isOpen, onClose, onSuccess }: CourseCreati
         title: '',
         description: '',
         category_id: '',
-        instructor_name: '',
         level: 'Beginner',
         price: '',
         duration: '',
@@ -140,12 +135,12 @@ export function CourseCreationModal({ isOpen, onClose, onSuccess }: CourseCreati
         is_active: true,
       })
     } catch (err: any) {
-      const errorMsg = err.response?.data?.message || 'Failed to create course'
-      setSubmitError(errorMsg)
+      const error = handleInstructorAPIError(err)
+      setSubmitError(error.message)
 
       // Handle validation errors from API
-      if (err.response?.data?.data && typeof err.response.data.data === 'object') {
-        setErrors(err.response.data.data)
+      if (err.response?.data?.errors && typeof err.response.data.errors === 'object') {
+        setErrors(err.response.data.errors)
       }
     } finally {
       setSubmitting(false)
@@ -235,48 +230,27 @@ export function CourseCreationModal({ isOpen, onClose, onSuccess }: CourseCreati
                 )}
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-semibold text-gray-900 mb-2">
-                    Category *
-                  </label>
-                  <select
-                    name="category_id"
-                    value={formData.category_id}
-                    onChange={handleInputChange}
-                    disabled={submitting}
-                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent text-gray-900"
-                  >
-                    <option value="">Select a category</option>
-                    {categories.map((cat) => (
-                      <option key={cat.id} value={cat.id}>
-                        {cat.name}
-                      </option>
-                    ))}
-                  </select>
-                  {errors.category_id && (
-                    <p className="text-red-600 text-xs font-medium mt-1">⚠️ {errors.category_id[0]}</p>
-                  )}
-                </div>
-
-                <div>
-                  <label className="block text-sm font-semibold text-gray-900 mb-2">
-                    Instructor Name *
-                  </label>
-                  <input
-                    type="text"
-                    name="instructor_name"
-                    value={formData.instructor_name}
-                    onChange={handleInputChange}
-                    placeholder="e.g., John Doe"
-                    maxLength={255}
-                    disabled={submitting}
-                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent text-gray-900 placeholder-gray-500"
-                  />
-                  {errors.instructor_name && (
-                    <p className="text-red-600 text-xs font-medium mt-1">⚠️ {errors.instructor_name[0]}</p>
-                  )}
-                </div>
+              <div>
+                <label className="block text-sm font-semibold text-gray-900 mb-2">
+                  Category *
+                </label>
+                <select
+                  name="category_id"
+                  value={formData.category_id}
+                  onChange={handleInputChange}
+                  disabled={submitting}
+                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent text-gray-900"
+                >
+                  <option value="">Select a category</option>
+                  {categories.map((cat) => (
+                    <option key={cat.id} value={cat.id}>
+                      {cat.name}
+                    </option>
+                  ))}
+                </select>
+                {errors.category_id && (
+                  <p className="text-red-600 text-xs font-medium mt-1">⚠️ {errors.category_id[0]}</p>
+                )}
               </div>
             </div>
 
@@ -321,7 +295,7 @@ export function CourseCreationModal({ isOpen, onClose, onSuccess }: CourseCreati
 
                 <div>
                   <label className="block text-sm font-semibold text-gray-900 mb-2">
-                    Price (₦) *
+                    Price (₦)
                   </label>
                   <input
                     type="number"

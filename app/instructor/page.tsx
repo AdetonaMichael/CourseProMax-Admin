@@ -280,13 +280,13 @@ export default function InstructorDashboard() {
             <Card title="Revenue Summary">
               <div className="space-y-4">
                 {/* This Month */}
-                <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg p-4 border border-green-200">
+                <div className="bg-white rounded-lg p-4 border border-gray-200">
                   <div className="flex justify-between items-center">
                     <div>
                       <p className="text-xs text-gray-600 font-medium">This Month</p>
                       <p className="text-2xl font-bold text-gray-900">₦{(revenueData.this_month_revenue || 0).toLocaleString()}</p>
                     </div>
-                    <TrendingUp className="text-green-600" size={32} />
+                    <TrendingUp className="text-gray-600" size={32} />
                   </div>
                 </div>
 
@@ -489,7 +489,7 @@ export default function InstructorDashboard() {
                       ? 'bg-blue-100 text-blue-800'
                       : 'bg-gray-100 text-gray-800'
                   }`}>
-                    {status.charAt(0).toUpperCase() + status.slice(1)}
+                    {status ? status.charAt(0).toUpperCase() + status.slice(1) : 'Unknown'}
                   </span>
                 ),
               },
@@ -501,69 +501,68 @@ export default function InstructorDashboard() {
 
       {/* Key Insights & Recommendations */}
       <Card title="Key Insights & Recommendations" className="mb-8">
-        <div className="space-y-4">
-          {/* Revenue Insight */}
-          {revenueData && (
-            <div className="flex items-start gap-3 p-4 bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg border border-green-200">
-              <TrendingUp className="text-green-600 flex-shrink-0 mt-0.5" size={20} />
-              <div className="flex-1">
-                <h4 className="font-semibold text-green-900 text-sm mb-1">Revenue Growth</h4>
-                <p className="text-sm text-green-800">
-                  {revenueData.this_month_revenue > (revenueData.last_month_revenue || 0)
-                    ? `You've earned ₦${(revenueData.this_month_revenue - (revenueData.last_month_revenue || 0)).toLocaleString()} more this month compared to last month`
-                    : `Revenue trending similar to last month. Focus on course promotions to drive enrollment`}
-                </p>
+        <div className="overflow-x-auto">
+          <div className="flex gap-4 pb-4">
+            {/* Revenue Insight */}
+            {revenueData && (
+              <div className="flex-shrink-0 w-96 flex items-start gap-3 p-4 bg-white border border-gray-200 rounded-lg">
+                <TrendingUp className="text-gray-600 flex-shrink-0 mt-0.5" size={20} />
+                <div className="flex-1 min-w-0">
+                  <h4 className="font-semibold text-gray-900 text-sm mb-1">Revenue Growth</h4>
+                  <p className="text-sm text-gray-700 break-words">
+                    {revenueData.this_month_revenue > (revenueData.last_month_revenue || 0)
+                      ? `You've earned ₦${(revenueData.this_month_revenue - (revenueData.last_month_revenue || 0)).toLocaleString()} more this month`
+                      : `Revenue trending similar to last month. Focus on promotions to drive enrollment`}
+                  </p>
+                </div>
               </div>
-            </div>
-          )}
+            )}
 
-          {/* Student Engagement Insight */}
-          {stats && (
-            <div className="flex items-start gap-3 p-4 bg-gradient-to-r from-blue-50 to-cyan-50 rounded-lg border border-blue-200">
-              <Activity className="text-blue-600 flex-shrink-0 mt-0.5" size={20} />
-              <div className="flex-1">
-                <h4 className="font-semibold text-blue-900 text-sm mb-1">Student Engagement</h4>
-                <p className="text-sm text-blue-800">
-                  {((stats.active_students || 0) / (stats.total_students || 1) * 100).toFixed(1)}% of your students are actively learning.
-                  {((stats.active_students || 0) / (stats.total_students || 1)) < 0.5
-                    ? ' Consider sending reminders or updating your course content.'
-                    : ' Keep up the great engagement with your students!'}
-                </p>
+            {/* Student Engagement Insight */}
+            {stats && (
+              <div className="flex-shrink-0 w-96 flex items-start gap-3 p-4 bg-white border border-gray-200 rounded-lg">
+                <Activity className="text-gray-600 flex-shrink-0 mt-0.5" size={20} />
+                <div className="flex-1 min-w-0">
+                  <h4 className="font-semibold text-gray-900 text-sm mb-1">Student Engagement</h4>
+                  <p className="text-sm text-gray-700 break-words">
+                    {((stats.active_students || 0) / (stats.total_students || 1) * 100).toFixed(1)}% of your students are actively learning.
+                    {((stats.active_students || 0) / (stats.total_students || 1)) < 0.5
+                      ? ' Consider sending reminders.'
+                      : ' Keep up the great engagement!'}
+                  </p>
+                </div>
               </div>
-            </div>
-          )}
+            )}
 
-          {/* Course Performance Insight */}
-          {dashboardData?.top_performing_courses && dashboardData.top_performing_courses.length > 0 && (
-            <div className="flex items-start gap-3 p-4 bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg border border-purple-200">
-              <Star className="text-purple-600 flex-shrink-0 mt-0.5 fill-purple-600" size={20} />
-              <div className="flex-1">
-                <h4 className="font-semibold text-purple-900 text-sm mb-1">Top Performer</h4>
-                <p className="text-sm text-purple-800">
-                  <strong>{dashboardData.top_performing_courses[0].title}</strong> is your best course with {dashboardData.top_performing_courses[0].student_count} students and {(Number(dashboardData.top_performing_courses[0].average_rating) || 0).toFixed(1)}★ rating.
-                  {dashboardData.top_performing_courses[0].enrollment_trend === 'trending_up'
-                    ? ' Enrollment is increasing!'
-                    : ' Consider what makes this course successful and apply similar strategies to others.'}
-                </p>
+            {/* Course Performance Insight */}
+            {dashboardData?.top_performing_courses && dashboardData.top_performing_courses.length > 0 && (
+              <div className="flex-shrink-0 w-96 flex items-start gap-3 p-4 bg-white border border-gray-200 rounded-lg">
+                <Star className="text-gray-600 flex-shrink-0 mt-0.5" size={20} />
+                <div className="flex-1 min-w-0">
+                  <h4 className="font-semibold text-gray-900 text-sm mb-1">Top Performer</h4>
+                  <p className="text-sm text-gray-700 break-words">
+                    <strong>{dashboardData.top_performing_courses[0].title}</strong> has {dashboardData.top_performing_courses[0].student_count} students with {(Number(dashboardData.top_performing_courses[0].average_rating) || 0).toFixed(1)}★ rating.
+                  </p>
+                </div>
               </div>
-            </div>
-          )}
+            )}
 
-          {/* Course Completion Insight */}
-          {stats && (
-            <div className="flex items-start gap-3 p-4 bg-gradient-to-r from-amber-50 to-orange-50 rounded-lg border border-amber-200">
-              <CheckCircle className="text-amber-600 flex-shrink-0 mt-0.5" size={20} />
-              <div className="flex-1">
-                <h4 className="font-semibold text-amber-900 text-sm mb-1">Completion Rate</h4>
-                <p className="text-sm text-amber-800">
-                  {stats.course_completion_rate?.toFixed(1) || 0}% of your students are completing courses.
-                  {(stats.course_completion_rate || 0) < 70
-                    ? ' Focus on improving course structure and adding milestone celebrations to boost completion.'
-                    : ' Excellent completion rate! Your courses are keeping students engaged.'}
-                </p>
+            {/* Course Completion Insight */}
+            {stats && (
+              <div className="flex-shrink-0 w-96 flex items-start gap-3 p-4 bg-white border border-gray-200 rounded-lg">
+                <CheckCircle className="text-gray-600 flex-shrink-0 mt-0.5" size={20} />
+                <div className="flex-1 min-w-0">
+                  <h4 className="font-semibold text-gray-900 text-sm mb-1">Completion Rate</h4>
+                  <p className="text-sm text-gray-700 break-words">
+                    {stats.course_completion_rate?.toFixed(1) || 0}% of students are completing courses.
+                    {(stats.course_completion_rate || 0) < 70
+                      ? ' Focus on improving course structure.'
+                      : ' Excellent completion rate!'}
+                  </p>
+                </div>
               </div>
-            </div>
-          )}
+            )}
+          </div>
         </div>
       </Card>
     </InstructorLayout>

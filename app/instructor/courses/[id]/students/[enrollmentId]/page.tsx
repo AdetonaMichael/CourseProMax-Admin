@@ -104,7 +104,7 @@ export default function StudentProgressPage() {
                     : 'bg-gray-100 text-gray-800'
                 }`}
               >
-                {studentData.status.charAt(0).toUpperCase() + studentData.status.slice(1)}
+                {studentData.status ? studentData.status.charAt(0).toUpperCase() + studentData.status.slice(1) : 'Unknown'}
               </span>
             </div>
           </div>

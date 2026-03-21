@@ -1,19 +1,35 @@
 'use client'
 
 import React, { useState } from 'react';
-import { X, Upload } from 'lucide-react';
+import { X, Upload, Trash2, Loader } from 'lucide-react';
 import { API_ENDPOINTS } from '@/config/api';
 import { getStoredToken } from '@/utils/storage.utils';
 import { useNotification } from '@/hooks/useNotification';
+import { lessonService } from '@/services/lesson.service';
 
-export const VideoEditor = ({ courseId, lessonId, onClose }: { courseId: number; lessonId: number; onClose: () => void }) => {
+export const VideoEditor = ({
+  courseId,
+  lesson,
+  onClose,
+  onVideoChange,
+}: {
+  courseId: number;
+  lesson: { id: number; bunny_video_id?: string; };
+  onClose: () => void;
+  onVideoChange?: () => void;
+}) => {
+  const lessonId = lesson.id;
   const notification = useNotification();
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [videoFile, setVideoFile] = useState<File | null>(null);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [uploading, setUploading] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const [error, setError] = useState('');
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+
+  const hasVideo = !!lesson.bunny_video_id;
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -77,12 +93,31 @@ export const VideoEditor = ({ courseId, lessonId, onClose }: { courseId: number;
       }
 
       notification.success('Video uploaded successfully!');
+      onVideoChange?.();
       onClose();
     } catch (err: any) {
       console.error('Error uploading video:', err);
       setError(err.message || 'Error uploading video. Please try again.');
     } finally {
       setUploading(false);
+    }
+  };
+
+  const handleDeleteVideo = async () => {
+    try {
+      setDeleting(true);
+      setError('');
+      await lessonService.deleteVideoAdmin(courseId, lessonId);
+      notification.success('Video deleted successfully!');
+      setShowDeleteConfirm(false);
+      onVideoChange?.();
+      onClose();
+    } catch (err: any) {
+      console.error('Error deleting video:', err);
+      const errorMessage = err.response?.data?.data?.message || err.message || 'Error deleting video';
+      setError(errorMessage);
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -105,6 +140,63 @@ export const VideoEditor = ({ courseId, lessonId, onClose }: { courseId: number;
       {error && (
         <div className="mb-4 p-3 bg-red-100 border border-red-400 rounded">
           <p className="text-red-800 text-sm font-medium">{error}</p>
+        </div>
+      )}
+
+      {/* Video Status */}
+      {hasVideo && (
+        <div className="my-6 px-6">
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-blue-900">✓ Video attached to this lesson</p>
+                <p className="text-xs text-blue-700 mt-1">This lesson already has a video. You can replace it or delete it.</p>
+              </div>
+            </div>
+            {!showDeleteConfirm ? (
+              <button
+                type="button"
+                onClick={() => setShowDeleteConfirm(true)}
+                className="mt-3 flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition disabled:opacity-50"
+                disabled={deleting || uploading}
+              >
+                <Trash2 size={16} />
+                Delete Current Video
+              </button>
+            ) : (
+              <div className="mt-3 space-y-2">
+                <p className="text-sm font-medium text-red-900">Are you sure? This action cannot be undone.</p>
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={handleDeleteVideo}
+                    className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition disabled:opacity-50 flex items-center gap-2"
+                    disabled={deleting}
+                  >
+                    {deleting ? (
+                      <>
+                        <Loader size={16} className="animate-spin" />
+                        Deleting...
+                      </>
+                    ) : (
+                      <>
+                        <Trash2 size={16} />
+                        Delete
+                      </>
+                    )}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setShowDeleteConfirm(false)}
+                    className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition disabled:opacity-50"
+                    disabled={deleting}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       )}
 

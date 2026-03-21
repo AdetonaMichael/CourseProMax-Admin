@@ -5,6 +5,7 @@ import { Lesson } from '@/types'
 import { lessonService } from '@/services/lesson.service'
 import { Trash2, Edit, Play, HelpCircle, Plus, Video, CheckCircle2 } from 'lucide-react'
 import { useConfirmation } from '@/components/shared/ConfirmationDialog'
+import Image from 'next/image'
 
 interface LessonListProps {
   courseId: number
@@ -36,7 +37,7 @@ export const LessonList: React.FC<LessonListProps> = ({
     try {
       setLoading(true)
       setError(null)
-      const data = await lessonService.getLessonsByCourse(courseId)
+      const data = await lessonService.getLessonsByCourseInstructor(courseId)
       console.log('📋 LessonList received lessons:', data)
       setLessons(data)
     } catch (err) {
@@ -62,7 +63,7 @@ export const LessonList: React.FC<LessonListProps> = ({
 
     if (confirmed) {
       try {
-        await lessonService.deleteLesson(courseId, lessonId)
+        await lessonService.deleteLessonInstructor(courseId, lessonId)
         setLessons(lessons.filter(l => l.id !== lessonId))
         onDeleteLesson(lessonId)
       } catch (err) {
@@ -95,10 +96,10 @@ export const LessonList: React.FC<LessonListProps> = ({
   if (lessons.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-20 px-10 text-center bg-gray-50 rounded-lg">
-        <div className="text-6xl mb-4">📚</div>
+        <div className="text-6xl mb-4"><Image src="/icon.png" alt="Lesson" width={64} height={64} /></div>
         <h3 className="text-lg text-gray-900 mb-2">No Lessons Yet</h3>
         <p className="text-gray-600 mb-6 text-sm">Create your first lesson to get started.</p>
-        <button onClick={onAddLesson} className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:from-blue-700 hover:to-purple-700 transition transform hover:-translate-y-0.5">
+        <button onClick={onAddLesson} className="flex items-center gap-2 px-4 py-2 bg-black  text-white rounded-lg hover:bg-gray-700 transition transform hover:-translate-y-0.5">
           <Plus size={20} />
           Add First Lesson
         </button>
@@ -111,7 +112,7 @@ export const LessonList: React.FC<LessonListProps> = ({
       {!hideAddButton && (
         <div className="flex justify-between items-center gap-4 mb-6 flex-wrap sm:flex-nowrap">
           <h2 className="text-2xl font-semibold text-gray-900">Course Lessons</h2>
-          <button onClick={onAddLesson} className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:from-blue-700 hover:to-purple-700 transition transform hover:-translate-y-0.5 whitespace-nowrap">
+          <button onClick={onAddLesson} className="flex items-center gap-2 px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-700 transition transform hover:-translate-y-0.5 whitespace-nowrap">
             <Plus size={20} />
             Add Lesson
           </button>
@@ -139,35 +140,27 @@ export const LessonList: React.FC<LessonListProps> = ({
           
           return (
             <div key={lesson.id} className="flex-shrink-0 w-full md:w-auto">
-          <div key={lesson.id} className="bg-white border border-gray-200 rounded-lg p-5 transition-all hover:border-blue-600 hover:shadow-lg hover:-translate-y-1">
+          <div key={lesson.id} className="bg-white border border-gray-200 rounded-lg p-5 transition-all hover:border-gray-300 hover:shadow-md\">
             <div className="flex justify-between items-start gap-3 mb-3">
               <div className="flex-1">
                 <h3 className="text-base font-semibold text-gray-900 mb-2">{lesson.title}</h3>
                 {/* Content Indicators */}
                 <div className="flex flex-wrap gap-2 mb-2">
                   {hasVideo && (
-                    <div className="inline-flex items-center gap-1 px-3 py-1 bg-blue-100 text-blue-700 rounded-md text-xs font-semibold border border-blue-300">
+                    <div className="inline-flex items-center gap-1 px-3 py-1 bg-gray-100 text-gray-700 rounded-md text-xs font-medium border border-gray-200">
                       <Video size={14} />
                       Video
                     </div>
                   )}
                   {hasQuiz && (
-                    <div className="inline-flex items-center gap-1 px-3 py-1 bg-amber-100 text-amber-700 rounded-md text-xs font-semibold border border-amber-300">
+                    <div className="inline-flex items-center gap-1 px-3 py-1 bg-gray-100 text-gray-700 rounded-md text-xs font-medium border border-gray-200">
                       <CheckCircle2 size={14} />
                       Quiz
                     </div>
                   )}
                 </div>
               </div>
-              <span className={`inline-block px-3 py-1 rounded-full text-xs font-semibold uppercase whitespace-nowrap flex-shrink-0 ${
-                lesson.type === 'video' ? 'bg-blue-100 text-blue-700' :
-                lesson.type === 'reading' ? 'bg-purple-100 text-purple-700' :
-                lesson.type === 'quiz' ? 'bg-pink-100 text-pink-700' :
-                lesson.type === 'assignment' ? 'bg-teal-100 text-teal-700' :
-                lesson.type === 'interactive' ? 'bg-amber-100 text-amber-700' :
-                lesson.type === 'mixed' ? 'bg-lime-100 text-lime-700' :
-                'bg-violet-100 text-violet-700'
-              }`}>
+              <span className="inline-block px-3 py-1 rounded-full text-xs font-medium uppercase whitespace-nowrap flex-shrink-0 bg-gray-100 text-gray-700 border border-gray-200">
                 {lesson.type}
               </span>
             </div>
@@ -191,7 +184,7 @@ export const LessonList: React.FC<LessonListProps> = ({
             <div className="grid grid-cols-2 gap-2">
               <button
                 onClick={() => onManageVideos(lesson)}
-                className="flex items-center justify-center gap-2 px-3 py-2 bg-blue-50 text-blue-600 border border-blue-300 rounded hover:bg-blue-100 transition text-xs font-medium"
+                className="flex items-center justify-center gap-2 px-3 py-2 bg-gray-100 text-gray-700 border border-gray-200 rounded hover:bg-gray-200 transition text-xs font-medium"
                 title="Manage Videos"
               >
                 <Play size={16} />
@@ -199,7 +192,7 @@ export const LessonList: React.FC<LessonListProps> = ({
               </button>
               <button
                 onClick={() => onManageQuiz(lesson)}
-                className="flex items-center justify-center gap-2 px-3 py-2 bg-amber-50 text-amber-600 border border-amber-300 rounded hover:bg-amber-100 transition text-xs font-medium"
+                className="flex items-center justify-center gap-2 px-3 py-2 bg-gray-100 text-gray-700 border border-gray-200 rounded hover:bg-gray-200 transition text-xs font-medium"
                 title="Manage Quiz"
               >
                 <HelpCircle size={16} />
@@ -207,7 +200,7 @@ export const LessonList: React.FC<LessonListProps> = ({
               </button>
               <button
                 onClick={() => onEditLesson(lesson)}
-                className="flex items-center justify-center gap-2 px-3 py-2 bg-blue-50 text-blue-600 border border-blue-300 rounded hover:bg-blue-100 transition text-xs font-medium"
+                className="flex items-center justify-center gap-2 px-3 py-2 bg-gray-100 text-gray-700 border border-gray-200 rounded hover:bg-gray-200 transition text-xs font-medium"
                 title="Edit Lesson"
               >
                 <Edit size={16} />
@@ -215,7 +208,7 @@ export const LessonList: React.FC<LessonListProps> = ({
               </button>
               <button
                 onClick={() => handleDelete(lesson.id)}
-                className="flex items-center justify-center gap-2 px-3 py-2 bg-red-50 text-red-600 border border-red-300 rounded hover:bg-red-100 transition text-xs font-medium"
+                className="flex items-center justify-center gap-2 px-3 py-2 bg-red-50 text-red-600 border border-red-200 rounded hover:bg-red-100 transition text-xs font-medium"
                 title="Delete Lesson"
               >
                 <Trash2 size={16} />

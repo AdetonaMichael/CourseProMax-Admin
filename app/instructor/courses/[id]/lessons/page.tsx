@@ -209,7 +209,7 @@ export default function CourseLessonsPage() {
             <div className="flex gap-3">
               <button
                 type="submit"
-                className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                className="flex items-center gap-2 px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-700 transition-colors"
               >
                 <Plus size={16} />
                 Create Lesson

@@ -178,7 +178,7 @@ export default function EnrollmentDetailPage() {
             <div className="text-right">
               <p className="text-sm text-gray-600 mb-2">Status</p>
               <span className={`px-3 py-1 rounded-full text-sm font-medium ${statusBadgeColor(enrollment.status)}`}>
-                {enrollment.status.charAt(0).toUpperCase() + enrollment.status.slice(1)}
+                {enrollment.status ? enrollment.status.charAt(0).toUpperCase() + enrollment.status.slice(1) : 'Unknown'}
               </span>
               {enrollment.certificate_issued && (
                 <div className="mt-2 px-2 py-1 bg-yellow-100 text-yellow-700 rounded text-xs font-medium">
@@ -417,7 +417,7 @@ export default function EnrollmentDetailPage() {
                     <div className="flex items-start justify-between mb-2">
                       <h5 className="font-medium text-gray-900">{assignment.assignment_title}</h5>
                       <span className={`px-2 py-1 rounded text-xs font-medium ${assignmentStatusColor(assignment.status)}`}>
-                        {assignment.status.charAt(0).toUpperCase() + assignment.status.slice(1)}
+                        {assignment.status ? assignment.status.charAt(0).toUpperCase() + assignment.status.slice(1) : 'Unknown'}
                       </span>
                     </div>
 

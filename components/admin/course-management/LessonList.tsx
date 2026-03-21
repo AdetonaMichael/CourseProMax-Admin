@@ -205,8 +205,9 @@ export const LessonList = ({
           <div className="bg-white rounded-2xl max-w-2xl w-full my-8 shadow-2xl border border-gray-100">
             <VideoEditor
               courseId={courseId}
-              lessonId={selectedLesson.id}
+              lesson={selectedLesson}
               onClose={() => { setShowVideoEditor(false); setSelectedLesson(null) }}
+              onVideoChange={() => window.location.reload()}
             />
           </div>
         </div>
