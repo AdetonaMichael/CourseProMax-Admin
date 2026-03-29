@@ -173,8 +173,9 @@ export default function ProfilePage() {
                 <input
                   type="text"
                   value={profileForm.first_name}
+                  disabled={true}
                   onChange={(e) => setProfileForm({...profileForm, first_name: e.target.value})}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                  className="w-full px-3 py-2 border text-black border-gray-300 rounded-lg"
                 />
               </div>
               <div>
@@ -182,8 +183,9 @@ export default function ProfilePage() {
                 <input
                   type="text"
                   value={profileForm.last_name}
+                  disabled={true}
                   onChange={(e) => setProfileForm({...profileForm, last_name: e.target.value})}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                  className="w-full px-3 py-2 text-black border border-gray-300 rounded-lg"
                 />
               </div>
             </div>
@@ -193,8 +195,9 @@ export default function ProfilePage() {
               <input
                 type="tel"
                 value={profileForm.phone}
+                disabled={true}
                 onChange={(e) => setProfileForm({...profileForm, phone: e.target.value})}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                className="w-full px-3 py-2 border text-black border-gray-300 rounded-lg"
               />
             </div>
 
@@ -212,7 +215,7 @@ export default function ProfilePage() {
             <button
               onClick={handleSaveProfile}
               disabled={saving}
-              className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
+              className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors disabled:opacity-50"
             >
               {saving ? <Loader size={20} className="animate-spin" /> : <Save size={20} />}
               {saving ? 'Saving...' : 'Save Profile'}
@@ -297,7 +300,7 @@ export default function ProfilePage() {
           <button
             onClick={handleSavePayout}
             disabled={saving}
-            className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
+            className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors disabled:opacity-50"
           >
             {saving ? <Loader size={20} className="animate-spin" /> : <Save size={20} />}
             {saving ? 'Saving...' : 'Save Payout Information'}

@@ -407,9 +407,9 @@ export default function CourseDetailsPage() {
                           <span className="text-xs font-bold text-green-600 uppercase tracking-wider block mb-2">Avg. Completion</span>
                           <span className="text-3xl font-bold text-green-900">{course.analytics.avg_completion || 0}%</span>
                         </div>
-                        <div className="bg-gradient-to-br from-purple-50 to-purple-100 border border-purple-200 rounded-lg p-6">
-                          <span className="text-xs font-bold text-purple-600 uppercase tracking-wider block mb-2">Revenue</span>
-                          <span className="text-3xl font-bold text-purple-900">₦{Number(course.analytics.total_revenue || 0).toLocaleString()}</span>
+                        <div className="bg-gradient-to-br from-blue-50 to-blue-100 border border-purple-200 rounded-lg p-6">
+                          <span className="text-xs font-bold text-blue-600 uppercase tracking-wider block mb-2">Revenue</span>
+                          <span className="text-3xl font-bold text-blue-900">₦{Number(course.analytics.total_revenue || 0).toLocaleString()}</span>
                         </div>
                       </div>
 

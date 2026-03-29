@@ -63,7 +63,6 @@ export default function InstructorDashboard() {
         setLoading(true);
         setError(null);
 
-        console.log('[Instructor Dashboard] Loading comprehensive data...');
         const [overview, coursesData, revenueAnalytics] = await Promise.all([
           fetchDashboardOverview().catch((err) => {
             // Check for 401 errors specifically - these indicate session is invalid
@@ -92,11 +91,7 @@ export default function InstructorDashboard() {
           }),
         ]);
 
-        console.log('[Instructor Dashboard] Data loaded successfully:', {
-          hasOverview: !!overview,
-          coursesCount: coursesData?.courses?.length || 0,
-          hasRevenue: !!revenueAnalytics,
-        });
+
 
         setDashboardData(overview);
         setCourses(coursesData?.courses || []);

@@ -64,8 +64,8 @@
 }
 
 .sidebar-link.active {
-  background: #3182ce;
-  color: white;
+  background: #fff;
+  color: #000;
 }
 
 .sidebar-icon {

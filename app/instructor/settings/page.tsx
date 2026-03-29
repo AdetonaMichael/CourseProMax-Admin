@@ -189,6 +189,7 @@ export default function SettingsPage() {
         </Card>
       </div>
 
+      
       {/* Course Settings */}
       <Card title="Course Settings" className="mt-6 lg:col-span-2">
         <div className="space-y-4">
@@ -249,7 +250,7 @@ export default function SettingsPage() {
         <button
           onClick={handleSave}
           disabled={saving}
-          className="flex items-center justify-center gap-2 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
+          className="flex items-center justify-center gap-2 px-6 py-2 bg-black text-white rounded-lg hover:bg-gray-900 transition-colors disabled:opacity-50"
         >
           {saving ? <Loader size={20} className="animate-spin" /> : <Save size={20} />}
           {saving ? 'Saving...' : 'Save Settings'}

@@ -331,7 +331,7 @@ export default function CourseForm({ course, loading = false, onSubmit, onError 
       <div className="form-actions">
         <Button
           type="submit"
-          variant="primary"
+          className='bg-black text-white'
           isLoading={submitting}
         >
           {isEditMode ? 'Update Course' : 'Create Course'}
