@@ -603,16 +603,16 @@ export default function Home() {
               </div>
               <div className="flex gap-12 md:gap-16 flex-wrap">
                 {[
-                  { heading: 'Product',     links: ['Features', 'Pricing', 'Security', 'API'] },
-                  { heading: 'Instructors', links: ['Getting Started', 'Dashboard', 'Certifications', 'Payouts'] },
-                  { heading: 'Company',     links: ['About', 'Blog', 'Careers', 'Contact'] },
+                  { heading: 'Product',     links: [{ label: 'Features', href: '#' }, { label: 'Pricing', href: '#' }, { label: 'API', href: '#' }] },
+                  { heading: 'Instructors', links: [{ label: 'Getting Started', href: '#' }, { label: 'Dashboard', href: '/dashboard' }, { label: 'Certifications', href: '#' }, { label: 'Payouts', href: '#' }] },
+                  { heading: 'Company',     links: [{ label: 'About', href: '/about' }, { label: 'Careers', href: '/careers' }, { label: 'Contact', href: '/contact' }] },
                 ].map(col => (
                   <div key={col.heading}>
                     <h5 className="text-xs font-semibold tracking-widest uppercase text-neutral-400 mb-4">{col.heading}</h5>
                     <ul className="flex flex-col gap-2.5 list-none">
                       {col.links.map(l => (
-                        <li key={l}>
-                          <a href="#" className="text-sm text-neutral-600 hover:text-white transition-colors no-underline">{l}</a>
+                        <li key={l.label}>
+                          <a href={l.href} className="text-sm text-neutral-600 hover:text-white transition-colors no-underline">{l.label}</a>
                         </li>
                       ))}
                     </ul>
